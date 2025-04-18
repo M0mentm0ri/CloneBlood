@@ -2,33 +2,33 @@ using UnityEngine;
 
 public class Walker : MonoBehaviour
 {
-    [Header("‘ÌŠ²")]
+    [Header("ï¿½ÌŠï¿½")]
     public Rigidbody2D core;
 
-    [Header("“ª")]
+    [Header("ï¿½ï¿½")]
     [SerializeField] Rigidbody2D head;
 
-    [Header("‘«")]
+    [Header("ï¿½ï¿½")]
     public Rigidbody2D leftLeg;
     public Rigidbody2D rightLeg;
 
-    [Header("‘«‚Ì–Ú•WˆÊ’u")]
+    [Header("ï¿½ï¿½ï¿½Ì–Ú•Wï¿½Ê’u")]
     public Transform footTargetL;
     public Transform footTargetR;
 
-    public Transform targetMarker; // ƒ^[ƒQƒbƒgˆÊ’u‚ğ‹Šo‰»—p‚É’u‚¯‚é‚È‚çi”CˆÓj
+    public Transform targetMarker; // ï¿½^ï¿½[ï¿½Qï¿½bï¿½gï¿½Ê’uï¿½ï¿½ï¿½ï¿½ï¿½oï¿½ï¿½ï¿½pï¿½É’uï¿½ï¿½ï¿½ï¿½È‚ï¿½iï¿½Cï¿½Ój
 
-    [Header("•àsİ’è")]
+    [Header("ï¿½ï¿½ï¿½sï¿½İ’ï¿½")]
     public float moveSpeed = 10f;
     public float stepDistance = 1.0f;
     public float stepSpeed = 4.0f;
     public float footFollowForce = 100f;
     public float uprightForce = 50f;
 
-    [Header("‘«‚Ìp¨§Œä")]
+    [Header("ï¿½ï¿½ï¿½Ìpï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")]
     public Rigidbody2D leftFoot;
     public Rigidbody2D rightFoot;
-    public float targetFootAngle = 0f; // ’n–Ê‚Æ…•½ = 0“x
+    public float targetFootAngle = 0f; // ï¿½nï¿½Ê‚Æï¿½ï¿½ï¿½ = 0ï¿½x
     public float footTorqueStiffness = 100f;
     public float footTorqueDamping = 10f;
 
@@ -41,7 +41,7 @@ public class Walker : MonoBehaviour
     private float inputX;
     private float currentOffsetX = 0f;
 
-    // ‘«‚ÌÚ’nƒ`ƒFƒbƒN—p•Ï”
+    // ï¿½ï¿½ï¿½ÌÚ’nï¿½`ï¿½Fï¿½bï¿½Nï¿½pï¿½Ïï¿½
     public Transform footCheckL;
     public Transform footCheckR;
     public float groundCheckRadius = 0.05f;
@@ -49,43 +49,43 @@ public class Walker : MonoBehaviour
 
     void FixedUpdate()
     {
-        // “ü—Íæ“¾i©¨ƒL[j
+        // ï¿½ï¿½ï¿½Íæ“¾ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ï¿½j
         inputX = Input.GetAxis("Horizontal");
 
         ApplyFootTorque(leftFoot);
         ApplyFootTorque(rightFoot);
 
-        // ƒ^[ƒQƒbƒgX‚ÌˆÊ’u‚ğ­‚µ‚¸‚ÂˆÚ“®iŠŠ‚ç‚©‚Éj
+        // ï¿½^ï¿½[ï¿½Qï¿½bï¿½gXï¿½ÌˆÊ’uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÂˆÚ“ï¿½ï¿½iï¿½ï¿½ï¿½ç‚©ï¿½Éj
         currentOffsetX = Mathf.MoveTowards(currentOffsetX, inputX * maxHorizontalOffset, moveSpeed * Time.fixedDeltaTime);
 
-        // ƒ^[ƒQƒbƒgˆÊ’ui˜{‘«‚Ì•½‹Ï‚©‚ç^ã‚Öj{XƒIƒtƒZƒbƒg
+        // ï¿½^ï¿½[ï¿½Qï¿½bï¿½gï¿½Ê’uï¿½iï¿½ï¿½ï¿½{ï¿½ï¿½ï¿½Ì•ï¿½ï¿½Ï‚ï¿½ï¿½ï¿½^ï¿½ï¿½Öjï¿½{Xï¿½Iï¿½tï¿½Zï¿½bï¿½g
         Vector2 basePos = (leftLeg.position + rightLeg.position + core.position) / 3;
         Vector2 targetPos = basePos + Vector2.up * hangHeight + Vector2.right * currentOffsetX;
 
-        // ƒ^[ƒQƒbƒgƒ}[ƒJ[‚Ì•\¦i”CˆÓj
+        // ï¿½^ï¿½[ï¿½Qï¿½bï¿½gï¿½}ï¿½[ï¿½Jï¿½[ï¿½Ì•\ï¿½ï¿½ï¿½iï¿½Cï¿½Ój
         if (targetMarker != null)
             targetMarker.position = targetPos;
 
-        // ‘«‚ªÚ’n‚µ‚Ä‚¢‚é‚©”»’è
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Ú’nï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½ï¿½ï¿½ï¿½
         bool isLeftGrounded = Physics2D.OverlapCircle(footCheckL.position, groundCheckRadius, groundLayer);
         bool isRightGrounded = Physics2D.OverlapCircle(footCheckR.position, groundCheckRadius, groundLayer);
         bool isAnyFootGrounded = isLeftGrounded || isRightGrounded;
 
-        // Ú’n‚µ‚Ä‚¢‚éê‡‚Ì‚İA“ª‚ğˆø‚Á’£‚é
+        // ï¿½Ú’nï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ê‡ï¿½Ì‚İAï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (isAnyFootGrounded)
         {
             Vector2 toTarget = targetPos - head.position;
-            Vector2 force = toTarget * hangForce - head.velocity * dampForce;
+            Vector2 force = toTarget * hangForce - head.linearVelocity * dampForce;
             head.AddForce(force);
         }
     }
 
     void ApplyFootTorque(Rigidbody2D footRb)
     {
-        float currentAngle = footRb.rotation; // Œ»İ‚ÌZ²‰ñ“]Šp
+        float currentAngle = footRb.rotation; // ï¿½ï¿½ï¿½İ‚ï¿½Zï¿½ï¿½ï¿½ï¿½]ï¿½p
         float angleDiff = Mathf.DeltaAngle(currentAngle, targetFootAngle);
 
-        // ƒoƒl—ÍiŠp“x· ~ „«j - Šp‘¬“x ~ Œ¸Š
+        // ï¿½oï¿½lï¿½Íiï¿½pï¿½xï¿½ï¿½ ï¿½~ ï¿½ï¿½ï¿½ï¿½ï¿½j - ï¿½pï¿½ï¿½ï¿½x ï¿½~ ï¿½ï¿½ï¿½ï¿½
         float torque = angleDiff * footTorqueStiffness - footRb.angularVelocity * footTorqueDamping;
 
         footRb.AddTorque(torque);
