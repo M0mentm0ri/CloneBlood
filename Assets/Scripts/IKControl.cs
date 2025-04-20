@@ -30,7 +30,7 @@ public class ArmIKLook : MonoBehaviour
         // マウスのワールド座標を取得
         Vector3 mouseWorld = cam.ScreenToWorldPoint(Input.mousePosition);
         mouseWorld.z = 0f;
-
+        
         // トグル式右クリック検知（押した瞬間だけ切り替え）
         bool currentRightClick = Input.GetMouseButton(1);
         if (currentRightClick && !previousRightClick)
