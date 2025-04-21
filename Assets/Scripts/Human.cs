@@ -26,15 +26,14 @@ public class Human : MonoBehaviour
     public float resetSpeed = 5f;
 
     [Header("見た目用Flip対象")]
+    public bool isRight = true;
     public Transform flipTarget;
 
     [SerializeField] private float flipSpeed = 5f; // 補間スピード
     [SerializeField] private float snapThreshold = 0.3f; // この範囲内は一気に反転
 
-    private float targetScaleX = 1f;
-    private float currentScaleX = 1f;
-
     [Header("手の移動制御")]
+    public Vector3 mouseWorld;
     public Transform centerPoint;
     public float maxArmDistance = 2.5f;
 
@@ -82,8 +81,15 @@ public class Human : MonoBehaviour
         // -------------------------------------
         // マウス座標の取得（Z軸を0に固定）
         // -------------------------------------
-        Vector3 mouseWorld = cam.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorld.z = 0f;
+        // カメラからのマウス位置でレイを飛ばし、キャラクターのZ平面と交差させる
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+
+        // このキャラのZ平面に当たる点を取得（たとえばキャラの中心Z位置）
+        float zPlane = transform.position.z;
+
+        // t = (目標Z - レイの原点Z) / レイの方向Z成分
+        float t = (zPlane - ray.origin.z) / ray.direction.z;
+        mouseWorld = ray.origin + ray.direction * t;
 
         // -------------------------------------
         // 右クリックでIK有効／無効を切り替え（トグル方式）
@@ -100,7 +106,7 @@ public class Human : MonoBehaviour
         // -------------------------------------
         // キャラの向き判定（マウスが右側か左側か）
         // -------------------------------------
-        bool isRight = mouseWorld.x > transform.position.x;
+        isRight = mouseWorld.x > transform.position.x;
 
         if (flipTarget == null) return;
 
