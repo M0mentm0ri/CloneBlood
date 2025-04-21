@@ -39,8 +39,8 @@ public class Human : MonoBehaviour
     public float maxArmDistance = 2.5f;
 
     [Header("移動速度")]
-    public float moveSpeedX = 5f; // 横移動速度
-    public float moveSpeedY = 5f; // 縦移動速度
+    [SerializeField] private float moveSpeedX = 10f;     // 横移動の加速力（Forceの大きさ）
+    [SerializeField] private float maxSpeed = 5f;        // 最大移動速度
 
     private Vector3 originalScale;
 
@@ -132,12 +132,20 @@ public class Human : MonoBehaviour
                 animator.SetFloat("Speed", 1f);  // それ以外の移動方向 → Speedを1に設定
             }
 
-            // 移動方向を設定
-            float moveX = Input.GetAxis("Horizontal") * moveSpeedX * Time.deltaTime;
-            float moveY = Input.GetAxis("Vertical") * moveSpeedY * Time.deltaTime;
+            // 入力を取得（-1〜1の範囲）
+            float inputX = Input.GetAxis("Horizontal");
 
-            // 移動する
-            transform.Translate(new Vector3(moveX, moveY, 0f));  // 移動方向に基づいてキャラクターを動かす
+            // 横方向にだけ力を加える
+            parentRb.AddForce(new Vector2(inputX * moveSpeedX, 0f), ForceMode2D.Force);
+
+            // 現在の速度を取得
+            Vector2 currentVelocity = parentRb.linearVelocity;
+
+            // 横方向の速度が最大速度を超えていたら制限（縦方向はそのまま）
+            if (Mathf.Abs(currentVelocity.x) > maxSpeed)
+            {
+                parentRb.linearVelocity = new Vector2(Mathf.Sign(currentVelocity.x) * maxSpeed, currentVelocity.y);
+            }
         }
         else
         {
@@ -189,6 +197,12 @@ public class Human : MonoBehaviour
         {
             rb.bodyType = RigidbodyType2D.Dynamic;
 
+            // 親の速度を各子パーツに渡す（慣性引き継ぎ）
+            if (parentRb != null)
+            {
+                rb.linearVelocity = parentRb.linearVelocity * 2;
+                rb.angularVelocity = parentRb.angularVelocity * 2;
+            }
         }
 
         if (ikManager != null) ikManager.enabled = false;
