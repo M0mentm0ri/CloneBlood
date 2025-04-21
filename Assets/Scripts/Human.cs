@@ -50,6 +50,7 @@ public class Human : MonoBehaviour
     public SpringJoint2D[] springJoint2Ds;
     public HingeJoint2D[] hingeJoint2Ds;
     public Rigidbody2D parentRb;      // 親のRigidbody2D
+    public Collider2D parent_collider2D;
     private bool isRagdollActive = false;
 
     void Start()
@@ -63,129 +64,139 @@ public class Human : MonoBehaviour
 
     void Update()
     {
-
-        // Rキーでラグドール化のトグル
+        // -------------------------------------
+        // Rキーでラグドール有効化（トグル）
+        // -------------------------------------
         if (!isRagdollActive)
         {
             if (Input.GetKeyDown(KeyCode.R))
             {
-                ActivateRagdoll();
+                ActivateRagdoll(); // ラグドール有効化
             }
-            
         }
         else
         {
-            return; // それ以外の処理は全部スキップ
+            return; // ラグドール中は一切の処理を停止（Updateの無駄処理防止）
         }
 
-        // マウスのワールド座標を取得
+        // -------------------------------------
+        // マウス座標の取得（Z軸を0に固定）
+        // -------------------------------------
         Vector3 mouseWorld = cam.ScreenToWorldPoint(Input.mousePosition);
         mouseWorld.z = 0f;
 
-        // 右クリックトグル検知（押した瞬間だけ切り替え）
+        // -------------------------------------
+        // 右クリックでIK有効／無効を切り替え（トグル方式）
+        // -------------------------------------
         bool currentRightClick = Input.GetMouseButton(1);
         if (currentRightClick && !previousRightClick)
         {
             isIKActive = !isIKActive;
-
-            // アニメーションレイヤーの重みを切り替え（0 = 無効、1 = 有効）
+            // IKのON/OFFに応じてアニメーションレイヤーの重みを変更
             animator.SetLayerWeight(armLayerIndex, isIKActive ? 0f : 1f);
         }
         previousRightClick = currentRightClick;
 
-
-        // キャラの向きを判定（マウスが右側か左側か）
+        // -------------------------------------
+        // キャラの向き判定（マウスが右側か左側か）
+        // -------------------------------------
         bool isRight = mouseWorld.x > transform.position.x;
 
         if (flipTarget == null) return;
 
         float targetSign = isRight ? 1f : -1f;
-
-        // 反転方向が変わる際、スムーズに補間
         Vector3 targetScale = originalScale;
         targetScale.x = Mathf.Abs(targetScale.x) * targetSign;
 
         if (Mathf.Abs(flipTarget.localScale.x - targetScale.x) < snapThreshold)
         {
+            // 十分近ければスナップして即反転
             flipTarget.localScale = targetScale;
         }
         else
         {
-            // 補間でスムーズに反転
+            // スムーズに反転するよう補間
             flipTarget.localScale = Vector3.Lerp(flipTarget.localScale, targetScale, Time.deltaTime * flipSpeed);
         }
 
-        // アニメーションコントローラーで歩行中かどうか
-        bool isWalking = Mathf.Abs(Input.GetAxis("Horizontal")) > 0 || Mathf.Abs(Input.GetAxis("Vertical")) > 0;
+        // -------------------------------------
+        // 移動処理：キー入力に応じて移動＋アニメーション切り替え
+        // -------------------------------------
+        float inputX = Input.GetAxis("Horizontal");
+        bool isWalking = Mathf.Abs(inputX) > 0;
 
         if (isWalking)
         {
-            animator.SetBool("IsWalk", true);  // 歩行中は歩行アニメーションをTrueに
+            animator.SetBool("IsWalk", true); // 歩行フラグをON
 
-            // 移動方向に応じてアニメーションのSpeedパラメータを設定
-            if ((isRight && Input.GetAxis("Horizontal") < 0) || (!isRight && Input.GetAxis("Horizontal") > 0))
-            {
-                animator.SetFloat("Speed", -1f); // 右向きの時に左に歩く → Speedを-1に設定
-            }
-            else
-            {
-                animator.SetFloat("Speed", 1f);  // それ以外の移動方向 → Speedを1に設定
-            }
+            // 逆向きに歩いているかどうか（右向きで左に歩く、またはその逆）
+            bool oppositeDirection = (isRight && inputX < 0) || (!isRight && inputX > 0);
 
-            // 入力を取得（-1〜1の範囲）
-            float inputX = Input.GetAxis("Horizontal");
-
-            // 横方向にだけ力を加える
+            // 横方向に力を加える（ForceMode2D.Force で加速度的に加える）
             parentRb.AddForce(new Vector2(inputX * moveSpeedX, 0f), ForceMode2D.Force);
 
             // 現在の速度を取得
             Vector2 currentVelocity = parentRb.linearVelocity;
 
-            // 横方向の速度が最大速度を超えていたら制限（縦方向はそのまま）
+            // 【ここがポイント】
+            // 現在の速度を最大速度で割って
+            float speedRatio = Mathf.Abs(currentVelocity.x) / maxSpeed;
+
+
+            // 最大速度制限（オーバーしていたら制限する）
             if (Mathf.Abs(currentVelocity.x) > maxSpeed)
             {
-                parentRb.linearVelocity = new Vector2(Mathf.Sign(currentVelocity.x) * maxSpeed, currentVelocity.y);
+                currentVelocity.x = Mathf.Sign(currentVelocity.x) * maxSpeed;
+                parentRb.linearVelocity = new Vector2(currentVelocity.x, currentVelocity.y);
             }
+
+            // 向きが逆ならマイナス値にして、反転再生
+            float animSpeed = speedRatio * (oppositeDirection ? -1f : 1f);
+            animator.SetFloat("Speed", animSpeed);
         }
         else
         {
-            animator.SetBool("IsWalk", false);  // 歩行していないときは歩行アニメーションをFalseに
-            animator.SetFloat("Speed", 1f);     // 歩行していない時はSpeedを1に戻す
+            animator.SetBool("IsWalk", false); // 静止時
+            animator.SetFloat("Speed", 0f);    // Speed値を初期状態に戻す
         }
 
+        // -------------------------------------
+        // IK処理（腕の追従制御）
+        // -------------------------------------
         if (isIKActive)
         {
+            // ArmSolverの左右反転を有効に
             leftSolver.flip = true;
             rightSolver.flip = true;
 
-            // 両手のオフセットを取得
+            // 各腕の現在のオフセットを保持
             Vector3 offset_Left = target_LeftArm.position - parent_LeftArm.position;
             Vector3 offset_Right = target_RightArm.position - parent_RightArm.position;
 
-            // 共通ターゲット位置を計算（左右両方の手が同じ位置に向かう）
+            // 両手が目指す共通ターゲット（マウス座標）
             Vector3 targetPos = mouseWorld;
 
-            // centerPointから一定の距離を超えないように制限
+            // 腕の最大移動距離を制限
             Vector3 direction = targetPos - centerPoint.position;
             float distance = direction.magnitude;
-
             if (distance > maxArmDistance)
             {
                 direction = direction.normalized * maxArmDistance;
                 targetPos = centerPoint.position + direction;
             }
 
-            // 両手を同じ位置にスムーズに移動
+            // 両手をターゲット位置に滑らかに移動させる（オフセット補正あり）
             parent_LeftArm.position = Vector3.Lerp(parent_LeftArm.position, targetPos - offset_Left, Time.deltaTime * moveSpeed);
             parent_RightArm.position = Vector3.Lerp(parent_RightArm.position, targetPos - offset_Right, Time.deltaTime * moveSpeed);
         }
         else
         {
-            // IK無効時は元の位置（ローカル座標）に戻す
+            // IKが無効なときは元の位置（ローカル）に戻す
             parent_LeftArm.localPosition = Vector3.Lerp(parent_LeftArm.localPosition, Vector3.zero, Time.deltaTime * resetSpeed);
             parent_RightArm.localPosition = Vector3.Lerp(parent_RightArm.localPosition, Vector3.zero, Time.deltaTime * resetSpeed);
         }
     }
+
 
     // ラグドール化の切り替え
     void ActivateRagdoll()
@@ -197,6 +208,10 @@ public class Human : MonoBehaviour
         {
             rb.bodyType = RigidbodyType2D.Dynamic;
 
+            if(parent_collider2D != null)
+            {
+                parent_collider2D.enabled = false;
+            }
             // 親の速度を各子パーツに渡す（慣性引き継ぎ）
             if (parentRb != null)
             {

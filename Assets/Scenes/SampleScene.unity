@@ -4605,8 +4605,12 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8082714016130002882, guid: e9f3b689f57c67b409ec9a0ab3a45015, type: 3}
+      propertyPath: collider2D
+      value: 
+      objectReference: {fileID: 128027829}
+    - target: {fileID: 8082714016130002882, guid: e9f3b689f57c67b409ec9a0ab3a45015, type: 3}
       propertyPath: moveSpeedX
-      value: 20
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 8082714016130002882, guid: e9f3b689f57c67b409ec9a0ab3a45015, type: 3}
       propertyPath: rigidbodies.Array.size
