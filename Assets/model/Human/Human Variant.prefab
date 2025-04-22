@@ -832,9 +832,6 @@ PrefabInstance:
       addedObject: {fileID: 1585530264066587035}
     - targetCorrespondingSourceObject: {fileID: 7774774255291539063, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1585912490538980362}
-    - targetCorrespondingSourceObject: {fileID: 7774774255291539063, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 7296544308936685770}
     - targetCorrespondingSourceObject: {fileID: 4248198761695161452, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
       insertIndex: -1
@@ -1260,11 +1257,6 @@ HingeJoint2D:
   m_AngleLimits:
     m_LowerAngle: 0
     m_UpperAngle: 359
---- !u!4 &2854485233760301450 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8775377467328796495, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
-  m_PrefabInstance: {fileID: 6797423197466191557}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3549397414855927312 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8004218455485415637, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
@@ -1386,27 +1378,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7774774255291539063, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
   m_PrefabInstance: {fileID: 6797423197466191557}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1585912490538980362
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3868811554341910706}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2127759caad1f46468524504efd2035b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  human: {fileID: 8082714016130002882}
-  gunWrist: {fileID: 2854485233760301450}
-  gunFront: {fileID: 1328833050583026674}
-  gunDirection: {fileID: 1413877382637671207}
-  shootForce: 500
-  angle_clamp: 90
-  range: 10
-  minAimDistance: 0.5
-  lineRenderer: {fileID: 7296544308936685770}
 --- !u!120 &7296544308936685770
 LineRenderer:
   serializedVersion: 2
@@ -2790,17 +2761,6 @@ HingeJoint2D:
   m_AngleLimits:
     m_LowerAngle: 0
     m_UpperAngle: 303.84
---- !u!114 &8082714016130002882 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3350359198231103751, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
-  m_PrefabInstance: {fileID: 6797423197466191557}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4209211254607360630}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5eab32b031e77248a220a34a82a2513, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8709892668993954137 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2777187555224913820, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
