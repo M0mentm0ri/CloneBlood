@@ -19,11 +19,30 @@ public class GunScript : MonoBehaviour
     // 最小距離：この距離未満なら固定
     public float minAimDistance = 0.5f;
 
+    public ParticleSystem Blood_Particle;
 
     public LineRenderer lineRenderer; // 線を描画するためのLineRenderer
 
     void Update()
     {
+        if (!human.isIKActive)
+        {
+            // Z軸を緩やかに0に戻す処理を追加
+            Vector3 currentEuler = gunWrist.localEulerAngles;
+
+            // Unityの角度は 0〜360 なので、範囲補正（例：359→-1）
+            float z = currentEuler.z;
+            if (z > 180f) z -= 360f;
+
+            // 緩やかに0へ近づける（Lerp）
+            float smoothedZ = Mathf.Lerp(z, 0f, Time.deltaTime * 5f); // 5fは速度。好みで調整可能
+            currentEuler.z = smoothedZ;
+
+            // 正しい角度範囲（0〜360）に戻して適用
+            gunWrist.localEulerAngles = new Vector3(currentEuler.x, currentEuler.y, (smoothedZ + 360f) % 360f);
+
+            return;
+        }
         // 🔥 マウス方向に手首（＝銃）を向ける
         AimAtMouse();
 
@@ -104,6 +123,11 @@ public class GunScript : MonoBehaviour
         // 1. 2D処理（ゲームロジック）
         // ==========================
 
+        if (Blood_Particle != null)
+        {
+            Blood_Particle.Play();
+        }
+
         // 方向計算（2DだけどZ=0で問題なし）
         Vector2 direction2D = (gunDirection.position - gunFront.position).normalized;
 
@@ -125,6 +149,8 @@ public class GunScript : MonoBehaviour
         // ==========================
         // 2. 3D処理（演出用デカール）
         // ==========================
+
+        return;
 
         // 3D用にVector3の方向を用意（Z方向も含む）
         Vector3 direction3D = (gunDirection.position - gunFront.position).normalized;
