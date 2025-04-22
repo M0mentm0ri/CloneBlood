@@ -11,6 +11,7 @@ public class GunScript : MonoBehaviour
     public float shootForce = 500f;   // 吹っ飛ばす力
     public float angle_clamp = 90f;         // 銃の角度制限
     public float range = 10f;         // Rayの射程距離
+    public GameObject decalPrefab; // Inspectorで設定
 
     // 最後のローカル角度を記憶する
     private float lastLocalAngle = 0f;
@@ -99,19 +100,62 @@ public class GunScript : MonoBehaviour
 
     void Shoot()
     {
-        Vector2 direction = (gunDirection.position - gunFront.position).normalized;
+        // ==========================
+        // 1. 2D処理（ゲームロジック）
+        // ==========================
 
-        RaycastHit2D hit = Physics2D.Raycast(gunFront.position, direction, range);
+        // 方向計算（2DだけどZ=0で問題なし）
+        Vector2 direction2D = (gunDirection.position - gunFront.position).normalized;
 
-        if (hit.collider != null)
+        // 2D Raycast（プレイヤーや敵などの2Dオブジェクト用）
+        RaycastHit2D hit2D = Physics2D.Raycast(gunFront.position, direction2D, range);
+
+        if (hit2D.collider != null)
         {
-            Debug.Log("命中: " + hit.collider.name);
+            Debug.Log("【2D命中】: " + hit2D.collider.name);
 
-            Rigidbody2D rb = hit.collider.GetComponent<Rigidbody2D>();
-            if (rb != null)
+            // Rigidbody2D を持ってたら吹っ飛ばす
+            Rigidbody2D rb2D = hit2D.collider.GetComponent<Rigidbody2D>();
+            if (rb2D != null)
             {
-                rb.AddForce(direction * shootForce);
+                rb2D.AddForce(direction2D * shootForce);
+            }
+        }
+
+        // ==========================
+        // 2. 3D処理（演出用デカール）
+        // ==========================
+
+        // 3D用にVector3の方向を用意（Z方向も含む）
+        Vector3 direction3D = (gunDirection.position - gunFront.position).normalized;
+
+        // 3D Raycast（壁や床など3Dオブジェクトへの命中確認）
+        if (Physics.Raycast(gunFront.position, direction3D, out RaycastHit hit3D, range))
+        {
+            Debug.Log("【3D命中】: " + hit3D.collider.name);
+
+            if (decalPrefab != null)
+            {
+                Vector3 spawnPos = hit3D.point + hit3D.normal * 0.01f;
+
+                // まず通常の回転
+                Quaternion lookRot = Quaternion.LookRotation(hit3D.normal);
+
+                // オイラー角に変換してX軸を反転
+                Vector3 euler = lookRot.eulerAngles;
+
+                // ↓↓↓ ここを +90°に強制する
+                euler.x = (euler.x + 180f) % 360f;
+
+                Quaternion finalRot = Quaternion.Euler(euler);
+
+                GameObject decal = Instantiate(decalPrefab, spawnPos, finalRot);
+                decal.transform.SetParent(hit3D.collider.transform);
+
+                // ランダム回転
+                decal.transform.Rotate(Vector3.forward, Random.Range(0f, 360f));
             }
         }
     }
+
 }

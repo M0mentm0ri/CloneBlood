@@ -18,7 +18,7 @@ public class Human : MonoBehaviour
     public Camera cam;
     public Animator animator;
     public int armLayerIndex = 1;
-    private bool isIKActive = false;
+    public bool isIKActive = false;
     private bool previousRightClick = false;
 
     [Header("動きの速度調整")]

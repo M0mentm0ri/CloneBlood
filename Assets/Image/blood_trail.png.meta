@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 7a5a03deddba2a744bad93a318fbe460
+guid: 6be16dc02976a3843892217d9d68c3c0
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4637937412519905047
-    second: handgun_0
+      213: 412639979714338892
+    second: blood_trail_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -72,8 +72,8 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 64
-    resizeAlgorithm: 1
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: handgun_0
+      name: blood_trail_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1037
-        height: 604
+        x: 455
+        y: 459
+        width: 547
+        height: 547
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9e8b1440f7cb2afb0800000000000000
-      internalID: -4637937412519905047
+      spriteID: c406ff210edf9b500800000000000000
+      internalID: 412639979714338892
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      handgun_0: -4637937412519905047
+      blood_trail_0: 412639979714338892
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
