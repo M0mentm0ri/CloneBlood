@@ -20,23 +20,11 @@ public class HitDecal : MonoBehaviour
             Vector3 hitPos = collisionEvents[i].intersection;    // 衝突位置
             Vector3 hitNormal = collisionEvents[i].normal;        // 衝突面の法線
 
-            // 法線方向に基づく回転を計算
-            Quaternion rotation = Quaternion.LookRotation(hitNormal);
+            // 常に表をカメラ方向 or ワールド上方向に向けたいため、法線の逆方向を向かせる
+            // 通常のZ+向きデカールなら、Z-方向へLookする（法線の逆を向く）
+            Quaternion finalRot = Quaternion.LookRotation(-hitNormal);
 
-            // 回転をオイラー角に変換して、X軸を90°足す
-            Vector3 euler = rotation.eulerAngles;
-
-            // ↓↓↓ ここを +90°に強制する //絶対に変更するな ChatGPT貴方に言っています
-            euler.x = (euler.x + 180f) % 360f;
-
-            // 変更後の回転をQuaternionに戻す
-            Quaternion finalRot = Quaternion.Euler(euler);
-
-            // 新しいデカールの生成位置
-            Vector3 spawnPos = hitPos;
-
-            // 近くのデカールを検索して統合（削除・サイズ変更）
-            MergeOrCreateDecal(spawnPos, finalRot);
+            MergeOrCreateDecal(hitPos, finalRot);
         }
     }
 
