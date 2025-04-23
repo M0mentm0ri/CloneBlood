@@ -11,7 +11,13 @@ public class GunScript : MonoBehaviour
     public float shootForce = 500f;   // 吹っ飛ばす力
     public float angle_clamp = 90f;         // 銃の角度制限
     public float range = 10f;         // Rayの射程距離
-    public GameObject decalPrefab; // Inspectorで設定
+    public GameObject mouthObject; // マウスの位置に移動させるオブジェクト
+
+    private Vector3 cachePosition;
+    // 最大移動可能距離（例えば2ユニットまでに制限）
+    public float maxDistance = 2.0f;
+    public float maxUpDistance = 1.5f; // 上方向の最大移動距離（インスペクターから設定）
+    private Vector3 initialLocalPosition;
 
     // 最後のローカル角度を記憶する
     private float lastLocalAngle = 0f;
@@ -22,6 +28,11 @@ public class GunScript : MonoBehaviour
     public ParticleSystem Blood_Particle;
 
     public LineRenderer lineRenderer; // 線を描画するためのLineRenderer
+
+    void Start()
+    {
+        initialLocalPosition = mouthObject.transform.localPosition;
+    }
 
     void Update()
     {
@@ -38,11 +49,45 @@ public class GunScript : MonoBehaviour
             float smoothedZ = Mathf.Lerp(z, 0f, Time.deltaTime * 5f); // 5fは速度。好みで調整可能
             currentEuler.z = smoothedZ;
 
-            // 正しい角度範囲（0〜360）に戻して適用
-            gunWrist.localEulerAngles = new Vector3(currentEuler.x, currentEuler.y, (smoothedZ + 360f) % 360f);
+            cachePosition.Set(currentEuler.x, currentEuler.y, (smoothedZ + 360f) % 360f);
+            gunWrist.localEulerAngles = cachePosition;
+
+            // マウスオブジェクトを緩やかに元の位置に戻す
+
+            cachePosition.x = gunWrist.position.x;
+            cachePosition.y = gunWrist.position.y;
+            cachePosition.z = mouthObject.transform.position.z;
+
+            mouthObject.transform.localPosition = Vector3.Lerp(
+                mouthObject.transform.localPosition,
+                initialLocalPosition,
+                Time.deltaTime * 5f // ← この数値が「戻る速度」
+            );
 
             return;
         }
+
+        // マウス位置（ターゲット位置）
+        Vector3 targetPos = human.mouseWorld;
+
+        // 中心点（制限の起点）
+        Vector3 center = human.centerPoint.position;
+
+        // 中心からマウスまでの距離ベクトル
+        Vector3 offset = targetPos - center;
+
+        // ---- 距離制限（XとYを個別に制限） ----
+
+        // X方向制限（左右）：maxDistance にクランプ
+        offset.x = Mathf.Clamp(offset.x, -maxDistance, maxDistance);
+
+        // Y方向制限（上下）：下は0、上は maxUpDistance にクランプ
+        offset.y = Mathf.Clamp(offset.y, 0f, maxUpDistance);
+
+        // 実際に mouthObject を更新する位置
+        mouthObject.transform.position = center + offset;
+
+
         // 🔥 マウス方向に手首（＝銃）を向ける
         AimAtMouse();
 
@@ -143,43 +188,6 @@ public class GunScript : MonoBehaviour
             if (rb2D != null)
             {
                 rb2D.AddForce(direction2D * shootForce);
-            }
-        }
-
-        // ==========================
-        // 2. 3D処理（演出用デカール）
-        // ==========================
-
-        return;
-
-        // 3D用にVector3の方向を用意（Z方向も含む）
-        Vector3 direction3D = (gunDirection.position - gunFront.position).normalized;
-
-        // 3D Raycast（壁や床など3Dオブジェクトへの命中確認）
-        if (Physics.Raycast(gunFront.position, direction3D, out RaycastHit hit3D, range))
-        {
-            Debug.Log("【3D命中】: " + hit3D.collider.name);
-
-            if (decalPrefab != null)
-            {
-                Vector3 spawnPos = hit3D.point + hit3D.normal * 0.01f;
-
-                // まず通常の回転
-                Quaternion lookRot = Quaternion.LookRotation(hit3D.normal);
-
-                // オイラー角に変換してX軸を反転
-                Vector3 euler = lookRot.eulerAngles;
-
-                // ↓↓↓ ここを +90°に強制する
-                euler.x = (euler.x + 180f) % 360f;
-
-                Quaternion finalRot = Quaternion.Euler(euler);
-
-                GameObject decal = Instantiate(decalPrefab, spawnPos, finalRot);
-                decal.transform.SetParent(hit3D.collider.transform);
-
-                // ランダム回転
-                decal.transform.Rotate(Vector3.forward, Random.Range(0f, 360f));
             }
         }
     }

@@ -38,8 +38,11 @@ public class Human : MonoBehaviour
     public float maxArmDistance = 2.5f;
 
     [Header("移動速度")]
-    [SerializeField] private float moveSpeedX = 10f;     // 横移動の加速力（Forceの大きさ）
-    [SerializeField] private float maxSpeed = 5f;        // 最大移動速度
+    [SerializeField] private float moveSpeedX = 10f;         // 横移動の加速力
+    [SerializeField] private float maxSpeed = 5f;            // 最大移動速度
+
+    [Header("アニメーション基準速度")]
+    [SerializeField] private float animBaseSpeed = 3f;       // この速度でアニメーションSpeed=1fになる
 
     private Vector3 originalScale;
 
@@ -128,42 +131,40 @@ public class Human : MonoBehaviour
         // -------------------------------------
         // 移動処理：キー入力に応じて移動＋アニメーション切り替え
         // -------------------------------------
+        // 入力取得
+
+
         float inputX = Input.GetAxis("Horizontal");
         bool isWalking = Mathf.Abs(inputX) > 0;
 
         if (isWalking)
         {
-            animator.SetBool("IsWalk", true); // 歩行フラグをON
+            animator.SetBool("IsWalk", true);
 
-            // 逆向きに歩いているかどうか（右向きで左に歩く、またはその逆）
             bool oppositeDirection = (isRight && inputX < 0) || (!isRight && inputX > 0);
 
-            // 横方向に力を加える（ForceMode2D.Force で加速度的に加える）
+            // 移動処理
             parentRb.AddForce(new Vector2(inputX * moveSpeedX, 0f), ForceMode2D.Force);
 
-            // 現在の速度を取得
             Vector2 currentVelocity = parentRb.linearVelocity;
 
-            // 【ここがポイント】
-            // 現在の速度を最大速度で割って
-            float speedRatio = Mathf.Abs(currentVelocity.x) / maxSpeed;
-
-
-            // 最大速度制限（オーバーしていたら制限する）
+            // 速度制限
             if (Mathf.Abs(currentVelocity.x) > maxSpeed)
             {
                 currentVelocity.x = Mathf.Sign(currentVelocity.x) * maxSpeed;
                 parentRb.linearVelocity = new Vector2(currentVelocity.x, currentVelocity.y);
             }
 
-            // 向きが逆ならマイナス値にして、反転再生
-            float animSpeed = speedRatio * (oppositeDirection ? -1f : 1f);
+            // ここが変更ポイント：アニメーション再生速度を animBaseSpeed で正規化
+            float animSpeedRatio = Mathf.Abs(currentVelocity.x) / animBaseSpeed;
+            float animSpeed = animSpeedRatio * (oppositeDirection ? -1f : 1f);
+
             animator.SetFloat("Speed", animSpeed);
         }
         else
         {
-            animator.SetBool("IsWalk", false); // 静止時
-            animator.SetFloat("Speed", 0f);    // Speed値を初期状態に戻す
+            animator.SetBool("IsWalk", false);
+            animator.SetFloat("Speed", 0f);
         }
 
         // -------------------------------------
