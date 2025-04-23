@@ -1837,15 +1837,42 @@ MonoBehaviour:
   cam: {fileID: 0}
   animator: {fileID: 8265343927666271637}
   armLayerIndex: 1
+  isIKActive: 0
   moveSpeed: 10
   resetSpeed: 5
+  isRight: 1
   flipTarget: {fileID: 703436309671183314}
   flipSpeed: 5
   snapThreshold: 0.35
+  mouseWorld: {x: 0, y: 0, z: 0}
   centerPoint: {fileID: 4945882363372809728}
   maxArmDistance: 1
   moveSpeedX: 2
-  moveSpeedY: 0
+  maxSpeed: 5
+  animBaseSpeed: 3
+  ikManager: {fileID: 0}
+  rigidbodies: []
+  springJoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  hingeJoints: []
+  parentRb: {fileID: 0}
+  parent_collider: {fileID: 0}
 --- !u!1 &7267162260732844912
 GameObject:
   m_ObjectHideFlags: 0

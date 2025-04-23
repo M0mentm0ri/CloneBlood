@@ -11,6 +11,9 @@ public class HitDecal : MonoBehaviour
     public float sizeIncrement = 0.2f; // 追加するサイズの増加量（0.2倍ずつ加算）
     public float maxSize = 3f; // 最大サイズの制限
 
+    // 吹っ飛ばす力の大きさ（調整可）
+    public float knockbackForce = 10f;
+
     void OnParticleCollision(GameObject other)
     {
         int numEvents = particleSystem.GetCollisionEvents(other, collisionEvents);
@@ -68,4 +71,5 @@ public class HitDecal : MonoBehaviour
             newDecal.tag = decalTag;  // タグを設定
         }
     }
+
 }

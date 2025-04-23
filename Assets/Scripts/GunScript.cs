@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(LineRenderer))]
 public class GunScript : MonoBehaviour
 {
 
@@ -27,7 +26,6 @@ public class GunScript : MonoBehaviour
 
     public ParticleSystem Blood_Particle;
 
-    public LineRenderer lineRenderer; // 線を描画するためのLineRenderer
 
     void Start()
     {
@@ -91,9 +89,6 @@ public class GunScript : MonoBehaviour
         // 🔥 マウス方向に手首（＝銃）を向ける
         AimAtMouse();
 
-        // 毎フレーム線を描画
-        UpdateLaserLine();
-
         // 発射処理
         if (Input.GetMouseButtonDown(0))
         {
@@ -153,14 +148,6 @@ public class GunScript : MonoBehaviour
         lastLocalAngle = finalLocalAngle;
     }
 
-    void UpdateLaserLine()
-    {
-        Vector2 direction = (gunDirection.position - gunFront.position).normalized;
-        Vector3 endPosition = gunFront.position + (Vector3)(direction * range);
-
-        lineRenderer.SetPosition(0, gunFront.position);
-        lineRenderer.SetPosition(1, endPosition);
-    }
 
     void Shoot()
     {
@@ -172,6 +159,8 @@ public class GunScript : MonoBehaviour
         {
             Blood_Particle.Play();
         }
+
+        return;
 
         // 方向計算（2DだけどZ=0で問題なし）
         Vector2 direction2D = (gunDirection.position - gunFront.position).normalized;

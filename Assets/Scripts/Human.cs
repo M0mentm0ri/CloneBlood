@@ -48,11 +48,11 @@ public class Human : MonoBehaviour
 
     // ラグドール化対象の Rigidbody2D のリスト
     public IKManager2D ikManager;
-    public Rigidbody2D[] rigidbodies;
-    public SpringJoint2D[] springJoint2Ds;
-    public HingeJoint2D[] hingeJoint2Ds;
-    public Rigidbody2D parentRb;      // 親のRigidbody2D
-    public Collider2D parent_collider2D;
+    public Rigidbody[] rigidbodies;
+    public SpringJoint[] springJoints;
+    public HingeJoint[] hingeJoints;
+    public Rigidbody parentRb;      // 親のRigidbody2D
+    public Collider parent_collider;
     private bool isRagdollActive = false;
 
     void Start()
@@ -144,7 +144,7 @@ public class Human : MonoBehaviour
             bool oppositeDirection = (isRight && inputX < 0) || (!isRight && inputX > 0);
 
             // 移動処理
-            parentRb.AddForce(new Vector2(inputX * moveSpeedX, 0f), ForceMode2D.Force);
+            parentRb.AddForce(new Vector2(inputX * moveSpeedX, 0f), ForceMode.Force);
 
             Vector2 currentVelocity = parentRb.linearVelocity;
 
@@ -213,19 +213,22 @@ public class Human : MonoBehaviour
 
         foreach (var rb in rigidbodies)
         {
-            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.isKinematic = false;
 
-            if(parent_collider2D != null)
+            if(parent_collider != null)
             {
-                parent_collider2D.enabled = false;
+                parent_collider.enabled = false;
             }
             // 親の速度を各子パーツに渡す（慣性引き継ぎ）
             if (parentRb != null)
             {
                 rb.linearVelocity = parentRb.linearVelocity * 2;
                 rb.angularVelocity = parentRb.angularVelocity * 2;
+                
             }
         }
+
+        parentRb.isKinematic = true;
 
         if (ikManager != null) ikManager.enabled = false;
         if (animator != null) animator.enabled = false; // アニメーション停止
@@ -236,13 +239,13 @@ public class Human : MonoBehaviour
     {
         yield return new WaitForSeconds(seconds);
 
-        foreach (var sp in springJoint2Ds)
+        foreach (var sp in springJoints)
         {
             if (!sp) continue;
             Destroy(sp);
         }
 
-        foreach (var h in hingeJoint2Ds)
+        foreach (var h in hingeJoints)
         {
             if (!h) continue;
             Destroy(h);
@@ -251,13 +254,13 @@ public class Human : MonoBehaviour
         foreach (var rb in rigidbodies)
         {
             rb.linearVelocity = Vector2.zero;
-            rb.angularVelocity = 0f;
+            rb.angularVelocity = Vector3.zero;
             Destroy(rb);
         }
 
         if (parentRb != null)
         {
-            parentRb.bodyType = RigidbodyType2D.Dynamic;
+            parentRb.isKinematic = false;
         }
     }
 }
