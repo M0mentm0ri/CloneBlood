@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 
 public class HitDecal : MonoBehaviour
@@ -6,13 +6,13 @@ public class HitDecal : MonoBehaviour
     public GameObject decalPrefab;
     public ParticleSystem particleSystem;
     private List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
-    public float decalMergeRadius = 0.5f; // “‡‚·‚é”¼Œai‹——£j‚ğw’è
-    public string decalTag = "Decal"; // “‡‘ÎÛ‚Ìƒ^ƒOiƒfƒJ[ƒ‹‚Ìƒ^ƒO‚ğw’èj
-    public float sizeIncrement = 0.2f; // ’Ç‰Á‚·‚éƒTƒCƒY‚Ì‘‰Á—Êi0.2”{‚¸‚Â‰ÁZj
-    public float maxSize = 3f; // Å‘åƒTƒCƒY‚Ì§ŒÀ
 
-    // ‚Á”ò‚Î‚·—Í‚Ì‘å‚«‚³i’²®‰Âj
-    public float knockbackForce = 10f;
+    public float decalMergeRadius = 0.5f;       // è¿‘ãã®ãƒ‡ã‚«ãƒ¼ãƒ«ã¨çµ±åˆã™ã‚‹åŠå¾„
+    public string decalTargetTag = "DecalTarget";     // ãƒ‡ã‚«ãƒ¼ãƒ«ã‚’è²¼ã£ã¦ã„ã„å¯¾è±¡ã®ã‚¿ã‚°ï¼ˆä¾‹: "Wall" ãªã©ï¼‰
+    public string decalTag = "Decal";     // ãƒ‡ã‚«ãƒ¼ãƒ«ã‚’è²¼ã£ã¦ã„ã„å¯¾è±¡ã®ã‚¿ã‚°ï¼ˆä¾‹: "Wall" ãªã©ï¼‰
+    public float sizeIncrement = 0.2f;          // ãƒ‡ã‚«ãƒ¼ãƒ«ãŒçµ±åˆã•ã‚ŒãŸã¨ãã®ã‚µã‚¤ã‚ºå¢—åŠ é‡
+    public float maxSize = 3f;                  // ãƒ‡ã‚«ãƒ¼ãƒ«ã®æœ€å¤§ã‚µã‚¤ã‚º
+    public float knockbackForce = 10f;          // å¹ã£é£›ã°ã—åŠ›ã®å¼·ã•
 
     void OnParticleCollision(GameObject other)
     {
@@ -20,29 +20,36 @@ public class HitDecal : MonoBehaviour
 
         for (int i = 0; i < numEvents; i++)
         {
-            Vector3 hitPos = collisionEvents[i].intersection;    // Õ“ËˆÊ’u
-            Vector3 hitNormal = collisionEvents[i].normal;        // Õ“Ë–Ê‚Ì–@ü
+            Vector3 hitPos = collisionEvents[i].intersection; // ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«è¡çªä½ç½®
+            Vector3 hitNormal = collisionEvents[i].normal;    // è¡çªã—ãŸé¢ã®æ³•ç·šæ–¹å‘
+            Quaternion finalRot = Quaternion.LookRotation(-hitNormal); // ãƒ‡ã‚«ãƒ¼ãƒ«ã®å‘ãã‚’æ³•ç·šã®é€†å‘ãã«è¨­å®š
 
-            // í‚É•\‚ğƒJƒƒ‰•ûŒü or ƒ[ƒ‹ƒhã•ûŒü‚ÉŒü‚¯‚½‚¢‚½‚ßA–@ü‚Ì‹t•ûŒü‚ğŒü‚©‚¹‚é
-            // ’Êí‚ÌZ+Œü‚«ƒfƒJ[ƒ‹‚È‚çAZ-•ûŒü‚ÖLook‚·‚éi–@ü‚Ì‹t‚ğŒü‚­j
-            Quaternion finalRot = Quaternion.LookRotation(-hitNormal);
+            // âœ… ã‚¿ã‚°ãŒä¸€è‡´ã™ã‚‹ã‚‚ã®ã«ã ã‘ãƒ‡ã‚«ãƒ¼ãƒ«å‡¦ç†ã‚’è¡Œã†
+            if (other.CompareTag(decalTargetTag))
+            {
+                MergeOrCreateDecal(hitPos, finalRot);
+            }
 
-            MergeOrCreateDecal(hitPos, finalRot);
+            // âœ… Rigidbodyä»˜ãã ã£ãŸã‚‰ãƒãƒƒã‚¯ãƒãƒƒã‚¯ã•ã›ã‚‹
+            Rigidbody rb = other.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                Vector3 forceDirection = hitNormal.normalized;
+                rb.AddForceAtPosition(forceDirection * knockbackForce, hitPos, ForceMode.Impulse);
+            }
         }
     }
 
-    // ‹ß‚­‚ÌƒfƒJ[ƒ‹‚ğŒŸõ‚µA“‡‚Ü‚½‚ÍV‹Kì¬
+    // è¿‘ãã«æ—¢å­˜ã®ãƒ‡ã‚«ãƒ¼ãƒ«ãŒã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã—ã¦çµ±åˆã™ã‚‹å‡¦ç†
     void MergeOrCreateDecal(Vector3 spawnPos, Quaternion rotation)
     {
-        // ‹ß‚­‚ÌƒfƒJ[ƒ‹‚ğŒŸõ
         Collider[] hitColliders = Physics.OverlapSphere(spawnPos, decalMergeRadius);
-
         GameObject closestDecal = null;
         float closestDistance = Mathf.Infinity;
 
         foreach (var collider in hitColliders)
         {
-            if (collider.CompareTag(decalTag))  // ƒ^ƒO‚ªˆê’v‚·‚éƒfƒJ[ƒ‹‚ğŒŸõ
+            if (collider.CompareTag(decalTag)) // ãƒ‡ã‚«ãƒ¼ãƒ«è‡ªä½“ã«ã¯ "Decal" ã‚¿ã‚°ã‚’ä½¿ç”¨
             {
                 float distance = Vector3.Distance(spawnPos, collider.transform.position);
                 if (distance < closestDistance)
@@ -53,23 +60,17 @@ public class HitDecal : MonoBehaviour
             }
         }
 
-        // ‹ß‚­‚ÉƒfƒJ[ƒ‹‚ª‚ ‚Á‚½ê‡A“‡
         if (closestDecal != null)
         {
-            // Šù‘¶‚ÌƒfƒJ[ƒ‹‚ÌƒTƒCƒY‚ğæ“¾i‰ŠúƒTƒCƒY‚ğŠî‚É‰ÁZ‚µ‚Ä‚¢‚­j
-            float currentSize = closestDecal.transform.localScale.x; // ‰¼‚É‘S²‚ª“¯‚¶ƒTƒCƒY‚¾‚Æ‰¼’è
-            float newSize = Mathf.Min(currentSize + sizeIncrement, maxSize); // ƒTƒCƒY‘‰Á—Êi0.2”{‰ÁZjAÅ‘åƒTƒCƒY§ŒÀ
-
-            // Šù‘¶‚ÌƒfƒJ[ƒ‹‚ÌƒTƒCƒY‚ğ•ÏX
-            closestDecal.transform.localScale = new Vector3(newSize, newSize, newSize);  // V‚µ‚¢ƒTƒCƒY‚ğİ’è
+            float currentSize = closestDecal.transform.localScale.x;
+            float newSize = Mathf.Min(currentSize + sizeIncrement, maxSize);
+            closestDecal.transform.localScale = new Vector3(newSize, newSize, newSize);
         }
         else
         {
-            // ‹ß‚­‚ÉƒfƒJ[ƒ‹‚ª‚È‚¯‚ê‚ÎV‚µ‚¢ƒfƒJ[ƒ‹‚ğ¶¬
             GameObject newDecal = Instantiate(decalPrefab, spawnPos, rotation);
-            newDecal.transform.localScale = new Vector3(1f, 1f, 1f); // ‰ŠúƒTƒCƒY
-            newDecal.tag = decalTag;  // ƒ^ƒO‚ğİ’è
+            newDecal.transform.localScale = Vector3.one;
+            newDecal.tag = decalTag; // â† ç”Ÿæˆã—ãŸãƒ‡ã‚«ãƒ¼ãƒ«ã«ã¯å¸¸ã« "Decal" ã‚¿ã‚°ã‚’ä»˜ã‘ã‚‹
         }
     }
-
 }

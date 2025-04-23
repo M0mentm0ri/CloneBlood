@@ -6,6 +6,7 @@ TagManager:
   tags:
   - ground
   - Decal
+  - DecalTarget
   layers:
   - Default
   - TransparentFX
