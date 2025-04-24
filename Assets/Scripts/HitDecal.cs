@@ -34,7 +34,7 @@ public class HitDecal : MonoBehaviour
             Rigidbody rb = other.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                Vector3 forceDirection = hitNormal.normalized;
+                Vector3 forceDirection = -hitNormal.normalized;
                 rb.AddForceAtPosition(forceDirection * knockbackForce, hitPos, ForceMode.Impulse);
             }
         }

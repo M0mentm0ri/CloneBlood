@@ -63,7 +63,6 @@ public class Human : MonoBehaviour
             originalScale = flipTarget.localScale;
         }
     }
-
     void Update()
     {
         // -------------------------------------
@@ -113,19 +112,19 @@ public class Human : MonoBehaviour
 
         if (flipTarget == null) return;
 
-        float targetSign = isRight ? 1f : -1f;
-        Vector3 targetScale = originalScale;
-        targetScale.x = Mathf.Abs(targetScale.x) * targetSign;
+        // 右向き: Y = 0, 左向き: Y = 180
+        float targetYRotation = isRight ? 0f : 180f;
+        Quaternion targetRotation = Quaternion.Euler(0f, targetYRotation, 0f);
 
-        if (Mathf.Abs(flipTarget.localScale.x - targetScale.x) < snapThreshold)
+        if (Quaternion.Angle(flipTarget.rotation, targetRotation) < snapThreshold)
         {
             // 十分近ければスナップして即反転
-            flipTarget.localScale = targetScale;
+            flipTarget.rotation = targetRotation;
         }
         else
         {
-            // スムーズに反転するよう補間
-            flipTarget.localScale = Vector3.Lerp(flipTarget.localScale, targetScale, Time.deltaTime * flipSpeed);
+            // スムーズに回転補間
+            flipTarget.rotation = Quaternion.Lerp(flipTarget.rotation, targetRotation, Time.deltaTime * flipSpeed);
         }
 
         // -------------------------------------
@@ -135,6 +134,7 @@ public class Human : MonoBehaviour
 
 
         float inputX = Input.GetAxis("Horizontal");
+
         bool isWalking = Mathf.Abs(inputX) > 0;
 
         if (isWalking)
@@ -224,7 +224,6 @@ public class Human : MonoBehaviour
             {
                 rb.linearVelocity = parentRb.linearVelocity * 2;
                 rb.angularVelocity = parentRb.angularVelocity * 2;
-                
             }
         }
 

@@ -32,4 +32,9 @@ public class ShadowController : MonoBehaviour
             decalShadow.localScale = Vector3.zero;
         }
     }
+
+    void LateUpdate()
+    {
+        transform.rotation = Quaternion.identity; // 親の回転を相殺して水平維持
+    }
 }
