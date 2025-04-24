@@ -31,6 +31,8 @@ public class Human : MonoBehaviour
 
     [SerializeField] private float flipSpeed = 5f; // 補間スピード
     [SerializeField] private float snapThreshold = 0.3f; // この範囲内は一気に反転
+    private Vector2 force = Vector2.zero;  // 毎回使い回す
+    private Vector2 limitedVelocity = Vector2.zero;
 
     [Header("手の移動制御")]
     public Vector3 mouseWorld;
@@ -43,6 +45,9 @@ public class Human : MonoBehaviour
 
     [Header("アニメーション基準速度")]
     [SerializeField] private float animBaseSpeed = 3f;       // この速度でアニメーションSpeed=1fになる
+
+    [Header("参照")]
+    public WeaponPickup weaponPickup; // 武器を持つスクリプト
 
     private Vector3 originalScale;
 
@@ -94,21 +99,42 @@ public class Human : MonoBehaviour
         mouseWorld = ray.origin + ray.direction * t;
 
         // -------------------------------------
-        // 右クリックでIK有効／無効を切り替え（トグル方式）
+        // 右クリックでIK有効／無効を切り替え（トグル方式）//持つ武器がない場合は無効
         // -------------------------------------
-        bool currentRightClick = Input.GetMouseButton(1);
-        if (currentRightClick && !previousRightClick)
-        {
-            isIKActive = !isIKActive;
-            // IKのON/OFFに応じてアニメーションレイヤーの重みを変更
-            animator.SetLayerWeight(armLayerIndex, isIKActive ? 0f : 1f);
-        }
-        previousRightClick = currentRightClick;
 
-        // -------------------------------------
-        // キャラの向き判定（マウスが右側か左側か）
-        // -------------------------------------
-        isRight = mouseWorld.x > transform.position.x;
+        if(weaponPickup == null)
+        {
+            return;
+        }
+
+        if (weaponPickup.HasGun)
+        {
+            bool currentRightClick = Input.GetMouseButton(1);
+            if (currentRightClick && !previousRightClick)
+            {
+                isIKActive = !isIKActive;
+                // IKのON/OFFに応じてアニメーションレイヤーの重みを変更
+                animator.SetLayerWeight(armLayerIndex, isIKActive ? 0f : 1f);
+            }
+            previousRightClick = currentRightClick;
+        }
+        else
+        {
+            if (isIKActive)
+            {
+                isIKActive = false;
+                // IKのON/OFFに応じてアニメーションレイヤーの重みを変更
+                animator.SetLayerWeight(armLayerIndex, isIKActive ? 0f : 1f);
+            }
+            
+        }
+
+
+
+            // -------------------------------------
+            // キャラの向き判定（マウスが右側か左側か）
+            // -------------------------------------
+            isRight = mouseWorld.x > transform.position.x;
 
         if (flipTarget == null) return;
 
@@ -134,35 +160,41 @@ public class Human : MonoBehaviour
 
 
         float inputX = Input.GetAxis("Horizontal");
-
         bool isWalking = Mathf.Abs(inputX) > 0;
 
         if (isWalking)
         {
             animator.SetBool("IsWalk", true);
 
+            // 向きの反転判定
             bool oppositeDirection = (isRight && inputX < 0) || (!isRight && inputX > 0);
 
             // 移動処理
-            parentRb.AddForce(new Vector2(inputX * moveSpeedX, 0f), ForceMode.Force);
+            force.x = inputX * moveSpeedX;
+            force.y = 0f;
+            parentRb.AddForce(force, ForceMode.Force);
 
-            Vector2 currentVelocity = parentRb.linearVelocity;
+            // 現在の速度を取得
+            limitedVelocity = parentRb.linearVelocity;
 
-            // 速度制限
-            if (Mathf.Abs(currentVelocity.x) > maxSpeed)
+            // 最大速度制限
+            if (Mathf.Abs(limitedVelocity.x) > maxSpeed)
             {
-                currentVelocity.x = Mathf.Sign(currentVelocity.x) * maxSpeed;
-                parentRb.linearVelocity = new Vector2(currentVelocity.x, currentVelocity.y);
+                limitedVelocity.x = Mathf.Sign(limitedVelocity.x) * maxSpeed;
+                parentRb.linearVelocity = limitedVelocity;
             }
 
-            // ここが変更ポイント：アニメーション再生速度を animBaseSpeed で正規化
-            float animSpeedRatio = Mathf.Abs(currentVelocity.x) / animBaseSpeed;
+            // アニメーション再生速度を移動速度に応じて正規化
+            float animSpeedRatio = Mathf.Abs(limitedVelocity.x) / animBaseSpeed;
+
+            // 向きに応じて符号反転（反対方向なら負にする）
             float animSpeed = animSpeedRatio * (oppositeDirection ? -1f : 1f);
 
             animator.SetFloat("Speed", animSpeed);
         }
         else
         {
+            // 止まっているとき
             animator.SetBool("IsWalk", false);
             animator.SetFloat("Speed", 0f);
         }
