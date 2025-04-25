@@ -22,6 +22,8 @@ public class WeaponPickup : MonoBehaviour
     public Transform gunWrist;              // 銃の回転対象となる手首（GunScriptから移籍）
     public bool HasGun; // 武器を持っているかどうか
 
+    public float shootCooldownTimer = 0f;
+
     private Vector3 initialLocalPosition;   // mouthObject の初期位置
     private float lastLocalAngle = 0f;      // 最後の手首角度（回転補正）
     private Vector3 cachePosition;
@@ -35,15 +37,10 @@ public class WeaponPickup : MonoBehaviour
 
     void Update()
     {
+
         if(human == null || human.isDead)
         {
             return;
-        }
-
-        // Fキーを押したら拾う
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            TryPickupWeapon();
         }
 
         if (!human.isIKActive)
@@ -52,19 +49,19 @@ public class WeaponPickup : MonoBehaviour
             return; // IKが無効な場合は何もしない
         }
 
+        // クールダウンタイマーを減らす
+        if (shootCooldownTimer > 0f)
+        {
+            shootCooldownTimer -= Time.deltaTime;
+        }
+
         MouthClamp();
 
         // 🔥 マウス方向に手首（＝銃）を向ける
         AimAtMouse();
-
-        // マウスクリックで発射（拾ってる武器があれば）
-        if (Input.GetMouseButtonDown(0) && currentGun != null)
-        {
-            currentGun.Shoot(); // GunScriptの発射関数を呼ぶだけ
-        }
     }
 
-    void TryPickupWeapon()
+    public void TryPickupWeapon()
     {
         if (currentGun != null)
         {

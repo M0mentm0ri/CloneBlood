@@ -4961,10 +4961,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2127759caad1f46468524504efd2035b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  human: {fileID: 0}
   gunFront: {fileID: 6758797071222118805}
   rigidbody: {fileID: 8667330772107657648}
   transform: {fileID: 7856628240815395282}
+  useblood: 3
   range: 10
   Blood_Particle: {fileID: 1042504784832235334}
 --- !u!54 &8667330772107657648

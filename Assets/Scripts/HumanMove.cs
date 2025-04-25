@@ -61,10 +61,11 @@ public class Human : MonoBehaviour
     private bool isRagdollActive = false;
 
 
+
     void Update()
     {
 
-        if(isDead || humanStats == null || !humanStats.IsInitiative)
+        if (isDead || humanStats == null || !humanStats.IsInitiative)
         {
             return; // 死亡時は何もしない
         }
@@ -76,12 +77,31 @@ public class Human : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.R))
             {
-                humanStats.Die(); // 死亡処理を呼び出す
+                humanStats.Dead(); // 死亡処理を呼び出す
             }
         }
         else
         {
             return; // ラグドール中は一切の処理を停止（Updateの無駄処理防止）
+        }
+
+        // Fキーを押したら拾う
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            weaponPickup.TryPickupWeapon();
+        }
+
+        // マウスクリックで発射（拾ってる武器があり、クールダウンが終わっていたら）
+        if (Input.GetMouseButtonDown(0) &&
+            weaponPickup.currentGun != null &&
+            weaponPickup.shootCooldownTimer <= 0f)
+        {
+            humanStats.currentBlood -= weaponPickup.currentGun.useblood;
+
+            weaponPickup.currentGun.Shoot(); // GunScriptの発射関数を呼ぶだけ
+
+            // クールダウン時間を設定（武器ごとに設定）
+            weaponPickup.shootCooldownTimer = weaponPickup.currentGun.cooldownTime;
         }
 
         UpdateMouse();

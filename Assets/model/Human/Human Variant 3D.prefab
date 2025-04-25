@@ -31,6 +31,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2854485233760301450}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6489489844015471873
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8997623550775021986}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8997623550775021986
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6489489844015471873}
+  serializedVersion: 2
+  m_LocalRotation: {x: 1.547292e-26, y: 0.0000000037200982, z: 5.756078e-35, w: 1}
+  m_LocalPosition: {x: 20.273994, y: 3.3455133, z: -3.4234102}
+  m_LocalScale: {x: 4.8899755, y: 4.8899755, z: 4.8899755}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6311328661222515991}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6612712363928891125
 GameObject:
   m_ObjectHideFlags: 0
@@ -914,6 +945,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 703436309671183314, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6898737674469863959}
+    - targetCorrespondingSourceObject: {fileID: 703436309671183314, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8997623550775021986}
     - targetCorrespondingSourceObject: {fileID: 8775377467328796495, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1986402886216848659}
@@ -1566,6 +1600,7 @@ MonoBehaviour:
   hitbox: {fileID: 1160657534010089421}
   human: {fileID: 8082714016130002882}
   weaponPickup: {fileID: 6898034142235324922}
+  cloneSpawner: {fileID: 0}
   lifespanText: {fileID: 0}
   lifeText: {fileID: 0}
   bloodGaugeObject: {fileID: 0}

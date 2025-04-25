@@ -13,9 +13,15 @@ public class CloneSpawner : MonoBehaviour
     public HumanStats currentHumanStats; // HumanStatsクラスの参照
 
     //HumanStatsに渡すパス
-
+    [Header("UI")]
     public TMP_Text lifespanText; // 寿命を表示するTMP（設定しておく）
     public TMP_Text lifeText; // 寿命を表示するTMP（設定しておく）
+
+    public Transform bloodGaugeObject;
+
+    [Header("ゲージ設定")]
+    public float fullGaugeY = 1.0f;   // 体力100%時のローカルY
+    public float emptyGaugeY = 0.0f;  // 体力0%時のローカルY
 
     //CinemachineCamera のtagetを次のHumanに変更するためのカメラ
     public CinemachineCamera cinemachineCamera;
@@ -64,11 +70,8 @@ public class CloneSpawner : MonoBehaviour
 
         currentHumanStats.cloneSpawner = this; // CloneSpawnerの参照を設定
         currentHumanStats.cam = maincamera;
-
-        currentHumanStats.lifeText = lifeText;
-        currentHumanStats.lifespanText = lifespanText;
-
         currentHumanStats.IsInitiative = true; //操作するクローンに設定
+
     }
 
     private void UpdateUI()
@@ -112,14 +115,14 @@ public class CloneSpawner : MonoBehaviour
         }
 
         // 血液ゲージ（体力バー）のX位置更新
-        if (currentHumanStats.bloodGaugeObject != null)
+        if (bloodGaugeObject != null)
         {
-            float healthPercent = Mathf.Clamp01(currentHumanStats.currentHealth / currentHumanStats.maxHealth); // 0～1
-            float y = Mathf.Lerp(currentHumanStats.emptyGaugeY, currentHumanStats.fullGaugeY, healthPercent);   // 線形補間で位置を計算
+            float BloodPercent = Mathf.Clamp01(currentHumanStats.currentBlood / currentHumanStats.maxBlood); // 0～1
+            float y = Mathf.Lerp(emptyGaugeY,fullGaugeY, BloodPercent);   // 線形補間で位置を計算
 
-            Vector3 localPos = currentHumanStats.bloodGaugeObject.localPosition;
+            Vector3 localPos = bloodGaugeObject.localPosition;
             localPos.y = y;
-            currentHumanStats.bloodGaugeObject.localPosition = localPos;
+            bloodGaugeObject.localPosition = localPos;
         }
     }
 }

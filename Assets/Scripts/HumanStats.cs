@@ -5,28 +5,20 @@ using TMPro; // TextMeshProを使う場合に必要
 public class HumanStats : MonoBehaviour
 {
     [Header("基本ステータス")]
-    public float maxHealth = 100f; // 最大HP
-    public float currentHealth;    // 現在のHP
+    public float maxBlood = 100f; // 最大HP
+    public float currentBlood;    // 現在のHP
     public float lifespan = 60f;   // 寿命（秒）
     public float age = 0f;  // 経過時間（寿命に使用）
 
     [Header("あたり判定")]
     public Collider hitbox;
 
-
     [Header("参照")]
     public Human human; // Humanクラスの参照
     public WeaponPickup weaponPickup; // 武器を持つスクリプト
     public CloneSpawner cloneSpawner; // クローンを生成するスクリプト
 
-    [Header("UI表示")]
-    public TMP_Text lifespanText; // 寿命を表示するTMP（設定しておく）
-    public TMP_Text lifeText; // 寿命を表示するTMP（設定しておく）
-    public Transform bloodGaugeObject; // ゲージを動かすオブジェクト（例：赤いバーの中身）
 
-    [Header("ゲージ設定")]
-    public float fullGaugeY = 1.0f;   // 体力100%時のローカルY
-    public float emptyGaugeY = 0.0f;  // 体力0%時のローカルY
 
     public Camera cam;
     public bool IsInitiative = false;
@@ -34,7 +26,7 @@ public class HumanStats : MonoBehaviour
 
     private void Start()
     {
-        currentHealth = maxHealth;
+        currentBlood = maxBlood;
     }
 
     private void Update()
@@ -42,6 +34,11 @@ public class HumanStats : MonoBehaviour
         if (!human.isDead || IsInitiative)
         {
             HandleLifespan();
+
+            if (currentBlood <= 0)
+            {
+                Dead();
+            }
         }
     }
 
@@ -51,23 +48,11 @@ public class HumanStats : MonoBehaviour
 
         if (age >= lifespan)
         {
-            Die();
+            Dead();
         }
     }
 
-    public void TakeDamage(float amount)
-    {
-        if (human.isDead) return;
-
-        currentHealth -= amount;
-
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
-    }
-
-    public void Die()
+    public void Dead()
     {
         if (human.isDead) return;
 

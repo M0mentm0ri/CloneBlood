@@ -821,6 +821,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 189587680}
   m_CullTransparentMesh: 1
+--- !u!1001 &206140725
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6683386961854090099, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
+      propertyPath: m_Name
+      value: ShotGun
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651945201069822454, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -7.33
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651945201069822454, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651945201069822454, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651945201069822454, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651945201069822454, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651945201069822454, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651945201069822454, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651945201069822454, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651945201069822454, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651945201069822454, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 679a01b7a2067934d840bf52e1004ade, type: 3}
 --- !u!1 &206375666
 GameObject:
   m_ObjectHideFlags: 0
@@ -9901,7 +9958,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -270}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 289, y: 711}
+  m_AnchoredPosition: {x: 289, y: -816}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1512901195
@@ -10552,6 +10609,9 @@ MonoBehaviour:
   currentHumanStats: {fileID: 0}
   lifespanText: {fileID: 414055082}
   lifeText: {fileID: 917649086}
+  bloodGaugeObject: {fileID: 1512901194}
+  fullGaugeY: 705
+  emptyGaugeY: -1200
   cinemachineCamera: {fileID: 1408529154}
   maincamera: {fileID: 2043234363}
   spawnPoint: {fileID: 1707737899}
@@ -17372,10 +17432,11 @@ SceneRoots:
   - {fileID: 1689237120}
   - {fileID: 2043234364}
   - {fileID: 1408529155}
-  - {fileID: 1231004185}
   - {fileID: 1572332015}
-  - {fileID: 999697324}
+  - {fileID: 1231004185}
+  - {fileID: 1707737899}
   - {fileID: 5781767933646315737}
   - {fileID: 1124710531}
   - {fileID: 29422436}
-  - {fileID: 1707737899}
+  - {fileID: 206140725}
+  - {fileID: 999697324}
