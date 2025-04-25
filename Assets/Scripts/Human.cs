@@ -21,6 +21,8 @@ public class Human : MonoBehaviour
     public bool isIKActive = false;
     private bool previousRightClick = false;
 
+    public bool isDead = false; // 死亡フラグ
+
     [Header("動きの速度調整")]
     public float moveSpeed = 10f;
     public float resetSpeed = 5f;
@@ -49,8 +51,6 @@ public class Human : MonoBehaviour
     [Header("参照")]
     public WeaponPickup weaponPickup; // 武器を持つスクリプト
 
-    private Vector3 originalScale;
-
     // ラグドール化対象の Rigidbody2D のリスト
     public IKManager2D ikManager;
     public Rigidbody[] rigidbodies;
@@ -60,16 +60,15 @@ public class Human : MonoBehaviour
     public Collider parent_collider;
     private bool isRagdollActive = false;
 
-    void Start()
-    {
-        // 起動時に元のスケールを保存
-        if (flipTarget != null)
-        {
-            originalScale = flipTarget.localScale;
-        }
-    }
+
     void Update()
     {
+
+        if(isDead)
+        {
+            return; // 死亡時は何もしない
+        }
+
         // -------------------------------------
         // Rキーでラグドール有効化（トグル）
         // -------------------------------------
@@ -131,10 +130,11 @@ public class Human : MonoBehaviour
 
 
 
-            // -------------------------------------
-            // キャラの向き判定（マウスが右側か左側か）
-            // -------------------------------------
-            isRight = mouseWorld.x > transform.position.x;
+        // -------------------------------------
+        // キャラの向き判定（マウスが右側か左側か）
+        // -------------------------------------
+
+        isRight = mouseWorld.x > transform.position.x;
 
         if (flipTarget == null) return;
 
@@ -293,5 +293,14 @@ public class Human : MonoBehaviour
         {
             parentRb.isKinematic = false;
         }
+    }
+
+    public void Dead()
+    {
+        isDead = true; // 死亡フラグを立てる
+        isIKActive = false; // IKを無効化
+        animator.SetLayerWeight(armLayerIndex, 0f); // アニメーションレイヤーの重みを0にする
+        // ラグドール化
+        ActivateRagdoll();
     }
 }

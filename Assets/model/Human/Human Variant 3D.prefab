@@ -5500,6 +5500,10 @@ PrefabInstance:
       value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 3350359198231103751, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
+      propertyPath: weaponPickup
+      value: 
+      objectReference: {fileID: 6898034142235324922}
+    - target: {fileID: 3350359198231103751, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
       propertyPath: animBaseSpeed
       value: 1.5
       objectReference: {fileID: 0}
@@ -5980,7 +5984,8 @@ PrefabInstance:
       value: 0.56418544
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2149748273960132303, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 703436309671183314, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
       insertIndex: 0
@@ -6002,8 +6007,11 @@ PrefabInstance:
       addedObject: {fileID: 2400652742588036805}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7223583827032691891, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 382523221456342746}
+      insertIndex: 2
+      addedObject: {fileID: 4748251744510858294}
+    - targetCorrespondingSourceObject: {fileID: 7223583827032691891, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
+      insertIndex: 3
+      addedObject: {fileID: 6898034142235324922}
     - targetCorrespondingSourceObject: {fileID: 7223583827032691891, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1160657534010089421}
@@ -6641,7 +6649,43 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7223583827032691891, guid: 3e700a49246af664cb2e286b57c70499, type: 3}
   m_PrefabInstance: {fileID: 6797423197466191557}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &382523221456342746
+--- !u!114 &4748251744510858294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4209211254607360630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61087eade976980449fe92f1b2b60f39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 0
+  lifespan: 60
+  hitbox: {fileID: 1160657534010089421}
+  human: {fileID: 8082714016130002882}
+  lifespanText: {fileID: 0}
+  bloodGaugeObject: {fileID: 0}
+  fullGaugeY: -226
+  emptyGaugeY: 317
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8082714016130002882}
+        m_TargetAssemblyTypeName: Human, Assembly-CSharp
+        m_MethodName: Dead
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &6898034142235324922
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6658,14 +6702,15 @@ MonoBehaviour:
   weaponLayer:
     serializedVersion: 2
     m_Bits: 128
-  pickupRange: 4
+  pickupRange: 1
   mouthObject: {fileID: 6947639112400689252}
   maxDistance: 2
   maxUpDistance: 1.5
   minAimDistance: 0.5
   angle_clamp: 90
-  currentGun: {fileID: 0}
+  currentGun: {fileID: 5618232067277000225}
   gunWrist: {fileID: 2854485233760301450}
+  HasGun: 0
 --- !u!136 &1160657534010089421
 CapsuleCollider:
   m_ObjectHideFlags: 0

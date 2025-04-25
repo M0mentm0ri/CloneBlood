@@ -35,6 +35,10 @@ public class WeaponPickup : MonoBehaviour
 
     void Update()
     {
+        if(human == null || human.isDead)
+        {
+            return;
+        }
 
         // Fキーを押したら拾う
         if (Input.GetKeyDown(KeyCode.F))
