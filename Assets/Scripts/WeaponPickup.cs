@@ -205,7 +205,7 @@ public class WeaponPickup : MonoBehaviour
         gunWrist.localEulerAngles = newEuler;
         lastLocalAngle = finalLocalAngle;
     }
-    void DropCurrentWeapon()
+    public void DropCurrentWeapon()
     {
         currentGun.rigidbody.isKinematic = false; // Rigidbodyを有効にする
         // 親子関係を切る（地面に落とす）
