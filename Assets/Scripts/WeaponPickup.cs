@@ -132,7 +132,6 @@ public class WeaponPickup : MonoBehaviour
             );
 
     }
-
     void MouthClamp()
     {
         // マウス位置（ターゲット位置）
@@ -207,6 +206,11 @@ public class WeaponPickup : MonoBehaviour
     }
     public void DropCurrentWeapon()
     {
+        if (currentGun == null)
+        {
+            return; // 何も持っていないなら何もしない
+        }
+
         currentGun.rigidbody.isKinematic = false; // Rigidbodyを有効にする
         // 親子関係を切る（地面に落とす）
         currentGun.transform.SetParent(null);

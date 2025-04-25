@@ -15,7 +15,6 @@ public class Human : MonoBehaviour
     public LimbSolver2D rightSolver;
 
     [Header("共通設定")]
-    public Camera cam;
     public Animator animator;
     public int armLayerIndex = 1;
     public bool isIKActive = false;
@@ -50,6 +49,7 @@ public class Human : MonoBehaviour
 
     [Header("参照")]
     public WeaponPickup weaponPickup; // 武器を持つスクリプト
+    public HumanStats humanStats; // 武器を持つスクリプト
 
     // ラグドール化対象の Rigidbody2D のリスト
     public IKManager2D ikManager;
@@ -64,7 +64,7 @@ public class Human : MonoBehaviour
     void Update()
     {
 
-        if(isDead)
+        if(isDead || humanStats == null || !humanStats.IsInitiative)
         {
             return; // 死亡時は何もしない
         }
@@ -76,7 +76,7 @@ public class Human : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.R))
             {
-                ActivateRagdoll(); // ラグドール有効化
+                humanStats.Die(); // 死亡処理を呼び出す
             }
         }
         else
@@ -84,11 +84,26 @@ public class Human : MonoBehaviour
             return; // ラグドール中は一切の処理を停止（Updateの無駄処理防止）
         }
 
-        // -------------------------------------
-        // マウス座標の取得（Z軸を0に固定）
-        // -------------------------------------
+        UpdateMouse();
+
+        ToggleIK();
+
+        UpdateFlip();
+
+        Move();
+
+        UpdateIK();
+    }
+
+    // -------------------------------------
+    // マウス座標の取得（Z軸を0に固定）
+    // -------------------------------------
+    void UpdateMouse()
+    {
+
+
         // カメラからのマウス位置でレイを飛ばし、キャラクターのZ平面と交差させる
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        Ray ray = humanStats.cam.ScreenPointToRay(Input.mousePosition);
 
         // このキャラのZ平面に当たる点を取得（たとえばキャラの中心Z位置）
         float zPlane = transform.position.z;
@@ -96,12 +111,16 @@ public class Human : MonoBehaviour
         // t = (目標Z - レイの原点Z) / レイの方向Z成分
         float t = (zPlane - ray.origin.z) / ray.direction.z;
         mouseWorld = ray.origin + ray.direction * t;
+    }
 
-        // -------------------------------------
-        // 右クリックでIK有効／無効を切り替え（トグル方式）//持つ武器がない場合は無効
-        // -------------------------------------
+    // -------------------------------------
+    // 右クリックでIK有効／無効を切り替え（トグル方式）//持つ武器がない場合は無効
+    // -------------------------------------
+    void ToggleIK()
+    {
 
-        if(weaponPickup == null)
+
+        if (weaponPickup == null)
         {
             return;
         }
@@ -125,14 +144,16 @@ public class Human : MonoBehaviour
                 // IKのON/OFFに応じてアニメーションレイヤーの重みを変更
                 animator.SetLayerWeight(armLayerIndex, isIKActive ? 0f : 1f);
             }
-            
+
         }
+    }
 
+    // -------------------------------------
+    // キャラの向き判定（マウスが右側か左側か）
+    // -------------------------------------
+    void UpdateFlip()
+    {
 
-
-        // -------------------------------------
-        // キャラの向き判定（マウスが右側か左側か）
-        // -------------------------------------
 
         isRight = mouseWorld.x > transform.position.x;
 
@@ -152,10 +173,14 @@ public class Human : MonoBehaviour
             // スムーズに回転補間
             flipTarget.rotation = Quaternion.Lerp(flipTarget.rotation, targetRotation, Time.deltaTime * flipSpeed);
         }
+    }
 
-        // -------------------------------------
-        // 移動処理：キー入力に応じて移動＋アニメーション切り替え
-        // -------------------------------------
+    // -------------------------------------
+    // 移動処理：キー入力に応じて移動＋アニメーション切り替え
+    // -------------------------------------
+    void Move()
+    {
+
         // 入力取得
 
 
@@ -198,10 +223,14 @@ public class Human : MonoBehaviour
             animator.SetBool("IsWalk", false);
             animator.SetFloat("Speed", 0f);
         }
+    }
 
-        // -------------------------------------
-        // IK処理（腕の追従制御）
-        // -------------------------------------
+    // -------------------------------------
+    // IK処理（腕の追従制御）
+    // -------------------------------------
+    void UpdateIK()
+    {
+
         if (isIKActive)
         {
             // ArmSolverの左右反転を有効に
@@ -238,7 +267,7 @@ public class Human : MonoBehaviour
 
 
     // ラグドール化の切り替え
-    void ActivateRagdoll()
+    public void ActivateRagdoll()
     {
         if (isRagdollActive) return; // 二度実行防止
         isRagdollActive = true;
@@ -295,12 +324,4 @@ public class Human : MonoBehaviour
         }
     }
 
-    public void Dead()
-    {
-        isDead = true; // 死亡フラグを立てる
-        isIKActive = false; // IKを無効化
-        animator.SetLayerWeight(armLayerIndex, 0f); // アニメーションレイヤーの重みを0にする
-        // ラグドール化
-        ActivateRagdoll();
-    }
 }
