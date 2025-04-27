@@ -25,6 +25,10 @@ PrefabInstance:
       value: 24.28
       objectReference: {fileID: 0}
     - target: {fileID: 1042504784832235334, guid: a8a2aa1d6d26fdd4ebdae8be0b042afc, type: 3}
+      propertyPath: ShapeModule.arc.mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1042504784832235334, guid: a8a2aa1d6d26fdd4ebdae8be0b042afc, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
       value: 4
       objectReference: {fileID: 0}

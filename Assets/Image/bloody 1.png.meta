@@ -1,0 +1,254 @@
+fileFormatVersion: 2
+guid: f551b95e20627564d9e36edccb9bc15d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4783051068149540962
+    second: bloody_0
+  - first:
+      213: -5874107724984339051
+    second: bloody_1
+  - first:
+      213: 2916265429124535246
+    second: bloody_2
+  - first:
+      213: -3729620793591294370
+    second: bloody_3
+  - first:
+      213: -4622415432297614375
+    second: bloody_4
+  - first:
+      213: -5009381584749767822
+    second: bloody_5
+  - first:
+      213: -4092551678616928674
+    second: bloody_6
+  - first:
+      213: 3227657753726369853
+    second: bloody_7
+  - first:
+      213: -3223120215040487136
+    second: bloody_8
+  - first:
+      213: -848833458374993260
+    second: bloody_9
+  - first:
+      213: 944900260417459840
+    second: bloody_10
+  - first:
+      213: -9164880849994139531
+    second: bloody_11
+  - first:
+      213: -448340817082843108
+    second: bloody_12
+  - first:
+      213: -4974149944533997558
+    second: bloody_13
+  - first:
+      213: 725443180525853366
+    second: bloody_14
+  - first:
+      213: 5107065665663779023
+    second: bloody_15
+  - first:
+      213: -8540227486129171772
+    second: bloody_16
+  - first:
+      213: 4583995542476812373
+    second: bloody_17
+  - first:
+      213: -5697053422378029401
+    second: bloody_18
+  - first:
+      213: -7053489164535986405
+    second: bloody_19
+  - first:
+      213: 4722423643308059508
+    second: bloody_20
+  - first:
+      213: -8073141428007501045
+    second: bloody_21
+  - first:
+      213: 5004446677961866272
+    second: bloody_22
+  - first:
+      213: -3675533526403291116
+    second: bloody_23
+  - first:
+      213: -1096795872527601634
+    second: bloody_24
+  - first:
+      213: -5123316108746866940
+    second: bloody_25
+  - first:
+      213: -9104199359405438081
+    second: bloody_26
+  - first:
+      213: -20976851995154232
+    second: bloody_27
+  - first:
+      213: -9182985064091554701
+    second: bloody_28
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 205, z: 277, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: bloody_90
+      rect:
+        serializedVersion: 2
+        x: 207
+        y: 207
+        width: 230
+        height: 233
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 550fd49a8af9d9f30800000000000000
+      internalID: 4583995542476812373
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 406c4cc1bd5b56447a81fc8abe7db9a2
+    internalID: 1212626655
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      bloody_0: -4783051068149540962
+      bloody_1: -5874107724984339051
+      bloody_10: 944900260417459840
+      bloody_11: -9164880849994139531
+      bloody_12: -448340817082843108
+      bloody_13: -4974149944533997558
+      bloody_14: 725443180525853366
+      bloody_15: 5107065665663779023
+      bloody_16: -8540227486129171772
+      bloody_18: -5697053422378029401
+      bloody_19: -7053489164535986405
+      bloody_2: 2916265429124535246
+      bloody_20: 4722423643308059508
+      bloody_21: -8073141428007501045
+      bloody_22: 5004446677961866272
+      bloody_23: -3675533526403291116
+      bloody_24: -1096795872527601634
+      bloody_25: -5123316108746866940
+      bloody_26: -9104199359405438081
+      bloody_27: -20976851995154232
+      bloody_28: -9182985064091554701
+      bloody_3: -3729620793591294370
+      bloody_4: -4622415432297614375
+      bloody_5: -5009381584749767822
+      bloody_6: -4092551678616928674
+      bloody_7: 3227657753726369853
+      bloody_8: -3223120215040487136
+      bloody_90: 4583995542476812373
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
 
 public class WeaponPickup : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class WeaponPickup : MonoBehaviour
 
     [Header("拾い条件")]
     public float pickupRange = 2f;          // 拾える距離
+    public float throwForce = 10f; // 投げる力
 
     [Header("照準補助")]
     public Transform mouthObject;           // マウス方向に移動するオブジェクト（照準点）
@@ -63,11 +65,8 @@ public class WeaponPickup : MonoBehaviour
 
     public void TryPickupWeapon()
     {
-        if (currentGun != null)
-        {
-            DropCurrentWeapon();
-        }
-        else
+
+        if (currentGun == null)
         {
             // 3D空間内での球体範囲の当たり判定
             Collider[] hits = Physics.OverlapSphere(transform.position, pickupRange, weaponLayer);
@@ -201,7 +200,7 @@ public class WeaponPickup : MonoBehaviour
         gunWrist.localEulerAngles = newEuler;
         lastLocalAngle = finalLocalAngle;
     }
-    public void DropCurrentWeapon()
+    public void DropWeapon()
     {
         if (currentGun == null)
         {
@@ -214,6 +213,43 @@ public class WeaponPickup : MonoBehaviour
         currentGun = null;
         HasGun = false; // 武器を持っていない状態に戻す
 
+    }
+
+    public void ThrowWeapon()
+    {
+
+        if (currentGun == null)
+        {
+            return; // 武器が無ければ何もしない
+        }
+
+        // 武器を投げるためのRigidbodyを取得
+        Rigidbody gunRigidbody = currentGun.GetComponent<Rigidbody>();
+        gunRigidbody.isKinematic = false; // Rigidbodyを有効にする
+        currentGun.transform.SetParent(null); // 親子関係を切る
+
+        // マウスの方向を取得
+        Vector3 mouseWorldPos = human.mouseWorld; // human.mouseWorld でマウスのワールド座標を取得
+        mouseWorldPos.z = 0; // Z軸を0にする（2Dの場合、Z軸は関係しない）
+
+        // 投げる方向を計算
+        Vector3 direction = (mouseWorldPos - currentGun.transform.position).normalized; // マウス方向のベクトル
+
+        // 投げる力を加える
+        gunRigidbody.AddForce(direction * throwForce, ForceMode.Impulse);
+
+        // 武器を落とす
+        currentGun = null;
+        HasGun = false; // 武器を持っていない状態に戻す
+    }
+
+
+    // 投げるアニメーションイベントから呼ばれる関数
+    public void OnThrow()
+    {
+        human.isThrow = false;
+        // 構えたポーズが終了した時に呼ばれる
+        ThrowWeapon();
     }
 
     // Gizmoで視覚確認

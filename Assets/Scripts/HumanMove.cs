@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.U2D.IK;
 using System.Collections;
+using UnityEngine.Rendering;
+using Unity.VisualScripting;
 
 public class Human : MonoBehaviour
 {
@@ -45,7 +47,8 @@ public class Human : MonoBehaviour
     [SerializeField] private float maxSpeed = 5f;            // 最大移動速度
 
     [Header("アニメーション基準速度")]
-    [SerializeField] private float animBaseSpeed = 3f;       // この速度でアニメーションSpeed=1fになる
+    [SerializeField] private float animWalkBaseSpeed = 3f;       // この速度でアニメーションSpeed=1fになる
+    [SerializeField] private float animRunBaseSpeed = 6f;       // この速度でアニメーションSpeed=1fになる
 
     [Header("参照")]
     public WeaponPickup weaponPickup; // 武器を持つスクリプト
@@ -56,9 +59,16 @@ public class Human : MonoBehaviour
     public Rigidbody[] rigidbodies;
     public SpringJoint[] springJoints;
     public HingeJoint[] hingeJoints;
+
+    public string ChangeLayer = "Player_Dead";
+    public SortingGroup sortingGroup;
+    public Transform[] Bones; // レイヤーを変更したいボーンをインスペクターで設定
     public Rigidbody parentRb;      // 親のRigidbody2D
     public Collider parent_collider;
     private bool isRagdollActive = false;
+    private bool hasPickedUpWeapon = false;  // 武器を拾ったかどうかを追跡
+    public bool isThrow = false;
+    private bool isRunning = false;
 
 
 
@@ -85,10 +95,31 @@ public class Human : MonoBehaviour
             return; // ラグドール中は一切の処理を停止（Updateの無駄処理防止）
         }
 
-        // Fキーを押したら拾う
-        if (Input.GetKeyDown(KeyCode.F))
+
+        // 右クリックで武器を拾う
+        if (Input.GetMouseButtonDown(1) && !weaponPickup.HasGun)
         {
             weaponPickup.TryPickupWeapon();
+            hasPickedUpWeapon = true;
+        }
+
+        // 右クリック長押しで投げるポーズになる
+        if (Input.GetMouseButton(1) && weaponPickup.HasGun && !hasPickedUpWeapon)
+        {
+            isThrow = true;
+            animator.SetBool("IsThrow", true);  // 投げるポーズアニメーションを開始
+        }
+
+        // 右クリックを離したら武器を投げる
+        if (Input.GetMouseButtonUp(1) && weaponPickup.HasGun && !hasPickedUpWeapon)
+        {
+            animator.SetBool("IsThrow", false);  // 投げるポーズを終了
+        }
+
+        // 右クリックで武器を拾う
+        if (Input.GetMouseButtonUp(1))
+        {
+            hasPickedUpWeapon = false;
         }
 
         // マウスクリックで発射（拾ってる武器があり、クールダウンが終わっていたら）
@@ -120,8 +151,6 @@ public class Human : MonoBehaviour
     // -------------------------------------
     void UpdateMouse()
     {
-
-
         // カメラからのマウス位置でレイを飛ばし、キャラクターのZ平面と交差させる
         Ray ray = humanStats.cam.ScreenPointToRay(Input.mousePosition);
 
@@ -139,32 +168,23 @@ public class Human : MonoBehaviour
     void ToggleIK()
     {
 
-
-        if (weaponPickup == null)
-        {
-            return;
-        }
-
-        if (weaponPickup.HasGun)
-        {
-            bool currentRightClick = Input.GetMouseButton(1);
-            if (currentRightClick && !previousRightClick)
-            {
-                isIKActive = !isIKActive;
-                // IKのON/OFFに応じてアニメーションレイヤーの重みを変更
-                animator.SetLayerWeight(armLayerIndex, isIKActive ? 0f : 1f);
-            }
-            previousRightClick = currentRightClick;
-        }
-        else
+        // 武器が無い、投げた、走ってる → どれかなら構え禁止
+        if (weaponPickup == null || !weaponPickup.HasGun || isThrow || isRunning)
         {
             if (isIKActive)
             {
                 isIKActive = false;
-                // IKのON/OFFに応じてアニメーションレイヤーの重みを変更
                 animator.SetLayerWeight(armLayerIndex, isIKActive ? 0f : 1f);
             }
-
+        }
+        else
+        {
+            // 武器あり・投げてない・歩きか止まってる → 構えON
+            if (!isIKActive)
+            {
+                isIKActive = true;
+                animator.SetLayerWeight(armLayerIndex, isIKActive ? 0f : 1f);
+            }
         }
     }
 
@@ -200,22 +220,29 @@ public class Human : MonoBehaviour
     // -------------------------------------
     void Move()
     {
-
         // 入力取得
-
-
         float inputX = Input.GetAxis("Horizontal");
         bool isWalking = Mathf.Abs(inputX) > 0;
 
+        // シフトキーが押されているかどうかを判定
+        isRunning = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
+        // 走っている場合は速度倍率を変更
+        float runSpeedMultiplier = isRunning ? 1.6f : 1f; // 走行時は倍率2倍
+
+        // 走行時の移動速度を設定
+        float currentMoveSpeed = moveSpeedX * runSpeedMultiplier; // 走行中はmoveSpeedXを倍率で調整
+
         if (isWalking)
         {
-            animator.SetBool("IsWalk", true);
+            animator.SetBool("IsWalk", true);        // 歩行アニメーション開始
+            animator.SetBool("IsRun", isRunning);   // 走行アニメーションを切り替え
 
             // 向きの反転判定
             bool oppositeDirection = (isRight && inputX < 0) || (!isRight && inputX > 0);
 
             // 移動処理
-            force.x = inputX * moveSpeedX;
+            force.x = inputX * currentMoveSpeed;  // 走行時も移動速度を倍率で調整
             force.y = 0f;
             parentRb.AddForce(force, ForceMode.Force);
 
@@ -223,25 +250,35 @@ public class Human : MonoBehaviour
             limitedVelocity = parentRb.linearVelocity;
 
             // 最大速度制限
-            if (Mathf.Abs(limitedVelocity.x) > maxSpeed)
+            if (Mathf.Abs(limitedVelocity.x) > maxSpeed * runSpeedMultiplier)  // maxSpeedにも倍率を掛ける
             {
-                limitedVelocity.x = Mathf.Sign(limitedVelocity.x) * maxSpeed;
-                parentRb.linearVelocity = limitedVelocity;
+                limitedVelocity.x = Mathf.Sign(limitedVelocity.x) * maxSpeed * runSpeedMultiplier;  // 現在の最大速度を適用
+                parentRb.linearVelocity = limitedVelocity; // 速度を制限
             }
 
             // アニメーション再生速度を移動速度に応じて正規化
-            float animSpeedRatio = Mathf.Abs(limitedVelocity.x) / animBaseSpeed;
+            float animSpeedRatio;
+
+            if (isRunning) // 走っている場合は走行アニメーションベーススピードを使用
+            {
+                animSpeedRatio = Mathf.Abs(limitedVelocity.x) / animRunBaseSpeed;
+            }
+            else // 歩行時は歩行アニメーションベーススピードを使用
+            {
+                animSpeedRatio = Mathf.Abs(limitedVelocity.x) / animWalkBaseSpeed;
+            }
 
             // 向きに応じて符号反転（反対方向なら負にする）
             float animSpeed = animSpeedRatio * (oppositeDirection ? -1f : 1f);
 
-            animator.SetFloat("Speed", animSpeed);
+            animator.SetFloat("Speed", animSpeed); // 移動速度に応じてアニメーションの速度を設定
         }
         else
         {
             // 止まっているとき
             animator.SetBool("IsWalk", false);
-            animator.SetFloat("Speed", 0f);
+            animator.SetBool("IsRun", false); // 走行アニメーションを停止
+            animator.SetFloat("Speed", 0f);  // 歩行速度も停止
         }
     }
 
@@ -296,7 +333,27 @@ public class Human : MonoBehaviour
         {
             rb.isKinematic = false;
 
-            if(parent_collider != null)
+            if (Bones != null)
+            {
+                foreach (Transform bone in Bones)
+                {
+                    if (bone != null)
+                    {
+                        bone.gameObject.layer = LayerMask.NameToLayer(ChangeLayer); // レイヤーを変更
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Bones to change are not assigned.");
+            }
+
+            if(sortingGroup != null)
+            {
+                sortingGroup.sortingOrder = 8;
+            }
+
+            if (parent_collider != null)
             {
                 parent_collider.enabled = false;
             }
