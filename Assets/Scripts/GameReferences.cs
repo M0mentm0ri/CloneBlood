@@ -5,9 +5,11 @@ public class GameReferences : MonoBehaviour
 {
     public static GameReferences Instance { get; private set; }
 
+
     // ここに固定参照するスクリプトを並べる
 
     [Header("参照リスト")]
+    public Shake shake; // Shakeクラスのインスタンスを保持
     public ParticleManager particleManager;
 
     // 必要に応じてどんどん追加していく

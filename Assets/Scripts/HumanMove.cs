@@ -70,8 +70,6 @@ public class Human : MonoBehaviour
     public bool isThrow = false;
     private bool isRunning = false;
 
-
-
     void Update()
     {
 
@@ -127,6 +125,10 @@ public class Human : MonoBehaviour
             weaponPickup.currentGun != null &&
             weaponPickup.shootCooldownTimer <= 0f)
         {
+
+            // 血のパーティクルを再生（必要なパーティクルを指定）
+            GameReferences.Instance.shake.ShakeScreen(1f);
+
             humanStats.currentBlood -= weaponPickup.currentGun.useblood;
 
             weaponPickup.currentGun.Shoot(); // GunScriptの発射関数を呼ぶだけ
