@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1042504784832235334}
   - component: {fileID: 883299803822618686}
   - component: {fileID: 7963569285101308595}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: Blood_Trail
   m_TagString: '@Enemy_5'
   m_Icon: {fileID: 0}
@@ -4908,10 +4908,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   decalPrefab: {fileID: 6684098707562927463, guid: ead47de04f1d8144a82c06172efc3fb3, type: 3}
   particleSystem: {fileID: 1042504784832235334}
-  decalMergeRadius: 0.8
   decalTargetTag: DecalTarget
-  decalTag: Blood
-  enemydecalTag: Blood_Enemy
+  IsEnemyBlood: 0
   sizeIncrement: 0.2
   maxSize: 3
   knockbackForce: 10

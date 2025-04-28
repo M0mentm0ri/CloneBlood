@@ -1914,7 +1914,8 @@ MonoBehaviour:
   weaponLayer:
     serializedVersion: 2
     m_Bits: 128
-  pickupRange: 1
+  pickupRange: 1.97
+  offset: {x: 0, y: 1.13, z: 0}
   throwForce: 10
   mouthObject: {fileID: 6947639112400689252}
   maxDistance: 2

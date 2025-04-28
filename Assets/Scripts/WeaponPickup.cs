@@ -10,6 +10,7 @@ public class WeaponPickup : MonoBehaviour
 
     [Header("拾い条件")]
     public float pickupRange = 2f;          // 拾える距離
+    public Vector3 offset = new Vector3(0, 1, 0); // Y軸方向に1ユニットのオフセットを追加
     public float throwForce = 10f; // 投げる力
 
     [Header("照準補助")]
@@ -66,10 +67,12 @@ public class WeaponPickup : MonoBehaviour
     public void TryPickupWeapon()
     {
 
+
+
         if (currentGun == null)
         {
-            // 3D空間内での球体範囲の当たり判定
-            Collider[] hits = Physics.OverlapSphere(transform.position, pickupRange, weaponLayer);
+            // 3D空間内での球体範囲の当たり判定（オフセットを加えた位置で判定）
+            Collider[] hits = Physics.OverlapSphere(transform.position + offset, pickupRange, weaponLayer);
             foreach (Collider hit in hits)
             {
                 GunScript gun = hit.GetComponent<GunScript>();
@@ -256,6 +259,6 @@ public class WeaponPickup : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, pickupRange);
+        Gizmos.DrawWireSphere(transform.position + offset, pickupRange);
     }
 }
