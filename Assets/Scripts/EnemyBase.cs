@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemyBase : MonoBehaviour
@@ -14,14 +15,23 @@ public class EnemyBase : MonoBehaviour
     public Transform targetPosition;
     public Animator animator;
 
+    //中心位置
+    public Transform flontposition; // 中心位置のTransform 
     // === スプライト ===
     public SpriteRenderer[] spriteRenderers;  // 複数のSpriteRendererを格納
     public Color maxHealthColor = Color.white; // 最大ヘルス時の色
     public Color minHealthColor = Color.red;  // 最低ヘルス時の色
 
+    [Header("参照")]
+    private ParticleManager particleManager; // パーティクルマネージャーの参照
+
     // === 状態管理 ===
     protected bool isDead = false;
 
+    private void Start()
+    {
+        particleManager = GameReferences.Instance.particleManager;
+    }
     // 更新処理
     protected virtual void Update()
     {
@@ -52,7 +62,7 @@ public class EnemyBase : MonoBehaviour
         float adjustedHealthRatio = Mathf.Pow(healthRatio, 0.5f); // 0.5f でゆっくりとした変化を得る
 
         // 色を補間
-        Color currentColor = Color.Lerp(minHealthColor, maxHealthColor, adjustedHealthRatio);
+        Color currentColor = Color.Lerp(minHealthColor, maxHealthColor, healthRatio);
 
         // すべてのSpriteRendererに色を設定
         foreach (SpriteRenderer renderer in spriteRenderers)
@@ -91,19 +101,18 @@ public class EnemyBase : MonoBehaviour
         {
             transform.position += direction * moveSpeed * Time.deltaTime;
 
-            // 進行方向を向く（X軸のスケールで反転させる）
+            // 進行方向を向く（X軸だけ反転させる）
             if (direction != Vector3.zero)
             {
-                // 進行方向が右ならそのまま、左なら反転
-                if (direction.x > 0 && transform.localScale.x < 0)
+                // 現在のスケールを保持したまま、X軸だけ反転
+                Vector3 currentScale = transform.localScale;
+                if (direction.x > 0)
                 {
-                    // 左向きから右向きに反転
-                    transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+                    transform.localScale = new Vector3(Mathf.Abs(currentScale.x), currentScale.y, currentScale.z); // 右向き
                 }
-                else if (direction.x < 0 && transform.localScale.x > 0)
+                else if (direction.x < 0)
                 {
-                    // 右向きから左向きに反転
-                    transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+                    transform.localScale = new Vector3(-Mathf.Abs(currentScale.x), currentScale.y, currentScale.z); // 左向き
                 }
             }
         }
@@ -171,5 +180,39 @@ public class EnemyBase : MonoBehaviour
     {
         isDead = true;
         animator.SetTrigger("Death");
+
+        // 血のパーティクルを再生（必要なパーティクルを指定）
+        GameReferences.Instance.particleManager.PlayParticle(
+            ParticleManager.ParticleType.BloodEnemy_Mid,  // 血のパーティクル（適切なものを選択）
+            flontposition.position,                           // 衝突位置 (キャラクターの位置)
+            flontposition.rotation                            // 衝突面に基づく回転 (キャラクターの回転)
+        );
+
+        // 死亡時にスケールを徐々に小さくする
+        StartCoroutine(ShrinkAndDestroy());
+    }
+
+    // 死亡時にスケールを小さくして消滅させる
+    private IEnumerator ShrinkAndDestroy()
+    {
+        float shrinkDuration = 2f; // 徐々に小さくする時間
+        Vector3 initialScale = transform.localScale;
+        Vector3 targetScale = Vector3.zero;
+
+        float elapsedTime = 0f;
+
+        // 徐々にスケールを小さくしていく
+        while (elapsedTime < shrinkDuration)
+        {
+            transform.localScale = Vector3.Lerp(initialScale, targetScale, elapsedTime / shrinkDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // 最終的にスケールを0にして消滅
+        transform.localScale = targetScale;
+
+        // オブジェクトを非アクティブ化して完全に消す
+        gameObject.SetActive(false);
     }
 }

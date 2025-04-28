@@ -129,8 +129,20 @@ PrefabInstance:
       value: 0.93450713
       objectReference: {fileID: 0}
     - target: {fileID: 6822241822344911893, guid: 3b291966d41fab842a5b830d68ec4795, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6822241822344911893, guid: 3b291966d41fab842a5b830d68ec4795, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6822241822344911893, guid: 3b291966d41fab842a5b830d68ec4795, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.3559445
+      objectReference: {fileID: 0}
+    - target: {fileID: 6822241822344911893, guid: 3b291966d41fab842a5b830d68ec4795, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 44.243
       objectReference: {fileID: 0}
     - target: {fileID: 7546933770020380462, guid: 3b291966d41fab842a5b830d68ec4795, type: 3}
       propertyPath: m_LocalPosition.x
@@ -320,6 +332,11 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0.4, y: -0.18, z: 0}
+--- !u!4 &3434987332186647743 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6131869422649969280, guid: 3b291966d41fab842a5b830d68ec4795, type: 3}
+  m_PrefabInstance: {fileID: 8841480892348245567}
+  m_PrefabAsset: {fileID: 0}
 --- !u!95 &3945114404944807896 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5479927062809616871, guid: 3b291966d41fab842a5b830d68ec4795, type: 3}
@@ -414,6 +431,7 @@ MonoBehaviour:
   baseMoveSpeed: 3
   targetPosition: {fileID: 0}
   animator: {fileID: 3945114404944807896}
+  flontposition: {fileID: 3434987332186647743}
   spriteRenderers:
   - {fileID: 7395213004346773624}
   - {fileID: 248790002317277706}

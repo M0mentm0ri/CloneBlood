@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1032549291064745728}
   m_Layer: 0
   m_Name: Blood_Decal
-  m_TagString: Decal
+  m_TagString: Blood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

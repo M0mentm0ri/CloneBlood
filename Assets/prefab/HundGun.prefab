@@ -4910,7 +4910,8 @@ MonoBehaviour:
   particleSystem: {fileID: 1042504784832235334}
   decalMergeRadius: 0.8
   decalTargetTag: DecalTarget
-  decalTag: Decal
+  decalTag: Blood
+  enemydecalTag: Blood_Enemy
   sizeIncrement: 0.2
   maxSize: 3
   knockbackForce: 10

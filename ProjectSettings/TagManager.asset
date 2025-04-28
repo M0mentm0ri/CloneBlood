@@ -5,10 +5,12 @@ TagManager:
   serializedVersion: 3
   tags:
   - ground
-  - Decal
   - DecalTarget
   - '@Enemy_100'
   - '@Enemy_5'
+  - Blood
+  - Blood_Enemy
+  - Decal
   layers:
   - Default
   - TransparentFX
