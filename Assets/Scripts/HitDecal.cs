@@ -8,15 +8,15 @@ public class HitDecal : MonoBehaviour
     public ParticleSystem particleSystem;
     private List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
 
-    private float decalMergeRadius = 1f;       // 近くのデカールと統合する半径
-    public string decalTargetTag = "DecalTarget";     // デカールを貼っていい対象のタグ（例: "Wall" など）
+    private float decalMergeRadius = 5f;       // 近くのデカールと統合する半径
+    private string decalTargetTag = "DecalTarget";     // デカールを貼っていい対象のタグ（例: "Wall" など）
     private string decalTag = "Blood";     // 血痕デカールのタグ（例: "Blood" など）
     private string enemydecalTag = "Blood_Enemy";     // 敵の血痕デカールのタグ（例: "Blood" など）
 
     public bool IsEnemyBlood = false; // 血痕が敵のものかどうか
-    public float sizeIncrement = 0.2f;          // デカールが統合されたときのサイズ増加量
-    public float maxSize = 3f;                  // デカールの最大サイズ
-    public float knockbackForce = 10f;          // 吹っ飛ばし力の強さ
+    private float sizeIncrement = 0.4f;          // デカールが統合されたときのサイズ増加量
+    private float maxSize = 6f;                  // デカールの最大サイズ
+    private float knockbackForce = 10f;          // 吹っ飛ばし力の強さ
 
     void OnParticleCollision(GameObject other)
     {
@@ -70,24 +70,38 @@ public class HitDecal : MonoBehaviour
         Collider[] hitColliders = Physics.OverlapSphere(spawnPos, decalMergeRadius);
         GameObject closestDecal = null;
         float closestDistance = Mathf.Infinity;
+        GameObject decalToReplace = null;
 
-        // デカールをチェックして削除
+        // ヒットしたコライダーをすべてチェック
         foreach (var collider in hitColliders)
         {
-            if (collider.CompareTag(tagToDestroy)) // 削除対象のタグを持つデカールがあれば削除
+            if (collider.CompareTag(tagToDestroy)) // 削除対象のタグを持つデカールがあれば
             {
-                Destroy(collider.gameObject); // デカールを削除
+                decalToReplace = collider.gameObject;
+                break; // 最初に見つけた1個だけ対象にしてループ終了
             }
-            else if (collider.CompareTag(tagToUse)) // 自身のタグと同じタグを持つデカールについてチェック
+            else if (collider.CompareTag(tagToUse)) // 自身のタグと同じデカールを探す場合
             {
-                // 近くにあるデカールの中で一番近いものを探す
+                // 近いものを探す（これはもし tagToDestroy が見つからなかった場合のため）
                 float distance = Vector3.Distance(spawnPos, collider.transform.position);
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
-                    closestDecal = collider.gameObject;
+                    decalToReplace = collider.gameObject;
                 }
             }
+        }
+
+        // 見つかったデカールを削除して、同じ位置に新しいデカールを生成
+        if (decalToReplace != null)
+        {
+            Vector3 replacePos = decalToReplace.transform.position; // 位置を保存
+            Quaternion replaceRot = decalToReplace.transform.rotation; // 回転も保存（必要なら）
+
+            Destroy(decalToReplace); // 古いデカールを削除
+
+            // ここで新しいデカールを同じ位置に生成
+            GameObject newDecal = Instantiate(decalPrefab, replacePos, replaceRot);
         }
 
         // 既存のデカールが近くにあった場合

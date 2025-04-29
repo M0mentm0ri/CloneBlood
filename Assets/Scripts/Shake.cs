@@ -3,26 +3,43 @@ using Unity.Cinemachine;
 
 public class Shake : MonoBehaviour
 {
-    // Chimachine Impulse Source コンポーネントを格納
-    public CinemachineImpulseSource impulseSource;
+    // 各種揺れ用のImpulseSourceを分けて登録
+    [Header("リコイル用 (ハンドガン)")]
+    public CinemachineImpulseSource handGunImpulse;
 
-    // 揺れの強さを決定する変数（0から1で設定）
-    public float shakeStrength = 1f;
+    [Header("リコイル用 (ショットガン)")]
+    public CinemachineImpulseSource shotgunImpulse;
 
+    [Header("爆発用")]
+    public CinemachineImpulseSource explosionImpulse;
 
-
-    // インパルスを発生させて画面を揺らす関数
-    public void ShakeScreen(float strength)
+    // 揺れのタイプを指定するenum
+    public enum ShakeType
     {
-        // 強さを調整
-        shakeStrength = Mathf.Clamp(strength, 0f, 1f); // 強さを0から1の間に制限
-
-        impulseSource.GenerateImpulse();
+        HandGun,
+        ShotGun,
+        Explosion
     }
 
-    // 強さを変える関数（外部から呼び出し可能）
-    public void SetShakeStrength(float strength)
+    // 揺れを発生させる関数
+    public void ShakeScreen(ShakeType type)
     {
-        shakeStrength = Mathf.Clamp(strength, 0f, 1f); // 強さを0から1の間に制限
+        switch (type)
+        {
+            case ShakeType.HandGun:
+                if (handGunImpulse != null)
+                    handGunImpulse.GenerateImpulse();
+                break;
+
+            case ShakeType.ShotGun:
+                if (shotgunImpulse != null)
+                    shotgunImpulse.GenerateImpulse();
+                break;
+
+            case ShakeType.Explosion:
+                if (explosionImpulse != null)
+                    explosionImpulse.GenerateImpulse();
+                break;
+        }
     }
 }

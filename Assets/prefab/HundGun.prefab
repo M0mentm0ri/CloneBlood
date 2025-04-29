@@ -4908,11 +4908,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   decalPrefab: {fileID: 6684098707562927463, guid: ead47de04f1d8144a82c06172efc3fb3, type: 3}
   particleSystem: {fileID: 1042504784832235334}
-  decalTargetTag: DecalTarget
   IsEnemyBlood: 0
-  sizeIncrement: 0.2
-  maxSize: 3
-  knockbackForce: 10
 --- !u!1 &5321445617761340247
 GameObject:
   m_ObjectHideFlags: 0
@@ -4975,7 +4971,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5321445617761340247}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 6
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -5093,7 +5089,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 7
+  m_SortingOrder: 8
   m_Sprite: {fileID: -4637937412519905047, guid: 7a5a03deddba2a744bad93a318fbe460, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

@@ -11,6 +11,8 @@ public class GunScript : MonoBehaviour
     public GameObject flashEffect;    // フラッシュエフェクト用のオブジェクト
     public ParticleSystem Blood_Particle;
 
+    public bool isHummer = false; // ハンマーかどうか
+
 
     // 銃を撃つ
     public void Shoot()

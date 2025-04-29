@@ -63,17 +63,19 @@ public class ParticleManager : MonoBehaviour
     /// <summary>
     /// 指定パーティクルを指定位置で再生する
     /// </summary>
-    public void PlayParticle(ParticleType type, Vector3 position, Quaternion rotation)
+public void PlayParticle(ParticleType type, Vector3 position, Quaternion rotation)
+{
+    if (!particles.ContainsKey(type))
     {
-        if (!particles.ContainsKey(type))
-        {
-            Debug.LogWarning($"{type} のパーティクルが存在しない");
-            return;
-        }
-
-        ParticleSystem ps = particles[type];
-        ps.transform.position = position;
-        ps.transform.rotation = rotation;
-        ps.Play();
+        Debug.LogWarning($"{type} のパーティクルが存在しない");
+        return;
     }
+
+    ParticleSystem prefab = particles[type]; // Prefabとして扱う
+    ParticleSystem instance = Instantiate(prefab, position, rotation); // ここで新しいパーティクルを生成
+    instance.Play();
+
+    // 再生が終わったら自動的に消す
+    Destroy(instance.gameObject, instance.main.duration + instance.main.startLifetime.constantMax);
+}
 }

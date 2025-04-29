@@ -11,6 +11,8 @@ TagManager:
   - Blood
   - Blood_Enemy
   - Decal
+  - '@Human_100'
+  - '@Human_5'
   layers:
   - Default
   - TransparentFX

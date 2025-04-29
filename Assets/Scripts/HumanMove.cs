@@ -127,7 +127,7 @@ public class Human : MonoBehaviour
         {
 
             // 血のパーティクルを再生（必要なパーティクルを指定）
-            GameReferences.Instance.shake.ShakeScreen(1f);
+            GameReferences.Instance.shake.ShakeScreen(Shake.ShakeType.HandGun);
 
             humanStats.currentBlood -= weaponPickup.currentGun.useblood;
 
@@ -136,6 +136,7 @@ public class Human : MonoBehaviour
             // クールダウン時間を設定（武器ごとに設定）
             weaponPickup.shootCooldownTimer = weaponPickup.currentGun.cooldownTime;
         }
+
 
         UpdateMouse();
 
@@ -165,13 +166,13 @@ public class Human : MonoBehaviour
     }
 
     // -------------------------------------
-    // 右クリックでIK有効／無効を切り替え（トグル方式）//持つ武器がない場合は無効
+    // IK有効／無効を切り替え（トグル方式）//持つ武器がない場合は無効
     // -------------------------------------
     void ToggleIK()
     {
 
         // 武器が無い、投げた、走ってる → どれかなら構え禁止
-        if (weaponPickup == null || !weaponPickup.HasGun || isThrow || isRunning)
+        if (weaponPickup == null || !weaponPickup.HasGun || isThrow || isRunning || weaponPickup.currentGun.isHummer)
         {
             if (isIKActive)
             {
@@ -352,7 +353,7 @@ public class Human : MonoBehaviour
 
             if(sortingGroup != null)
             {
-                sortingGroup.sortingOrder = 8;
+                sortingGroup.enabled = true; 
             }
 
             if (parent_collider != null)
@@ -372,7 +373,7 @@ public class Human : MonoBehaviour
         if (ikManager != null) ikManager.enabled = false;
         if (animator != null) animator.enabled = false; // アニメーション停止
 
-        StartCoroutine(FreezeAfterSeconds(3f)); // ラグドール3秒後に硬直
+        StartCoroutine(FreezeAfterSeconds(1f)); // ラグドール3秒後に硬直
     }
     IEnumerator FreezeAfterSeconds(float seconds)
     {

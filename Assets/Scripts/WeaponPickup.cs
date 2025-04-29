@@ -67,8 +67,6 @@ public class WeaponPickup : MonoBehaviour
     public void TryPickupWeapon()
     {
 
-
-
         if (currentGun == null)
         {
             // 3D空間内での球体範囲の当たり判定（オフセットを加えた位置で判定）
@@ -83,7 +81,6 @@ public class WeaponPickup : MonoBehaviour
                 }
             }
         }
-
     }
 
     void PickupWeapon(GunScript gun)
@@ -215,7 +212,6 @@ public class WeaponPickup : MonoBehaviour
         currentGun.transform.SetParent(null);
         currentGun = null;
         HasGun = false; // 武器を持っていない状態に戻す
-
     }
 
     public void ThrowWeapon()
