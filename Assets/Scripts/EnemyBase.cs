@@ -31,6 +31,7 @@ public class EnemyBase : MonoBehaviour
 
     [Header("参照")]
     private ParticleManager particleManager; // パーティクルマネージャーの参照
+    private WaveSystem waveSystem;
 
     // === 状態管理 ===
     protected bool isDead = false;
@@ -160,6 +161,10 @@ public class EnemyBase : MonoBehaviour
         // 攻撃ロジックを書く（例：ダメージ判定）
     }
 
+    public void SetWaveSystem(WaveSystem system)
+    {
+        waveSystem = system;
+    }
     private void OnParticleCollision(GameObject other)
     {
         if (isDead) return;
@@ -191,6 +196,7 @@ public class EnemyBase : MonoBehaviour
             flontposition.rotation                            // 衝突面に基づく回転 (キャラクターの回転)
         );
 
+        waveSystem?.OnEnemyDied();
         // 死亡時にスケールを徐々に小さくする
         StartCoroutine(ShrinkAndDestroy());
     }
