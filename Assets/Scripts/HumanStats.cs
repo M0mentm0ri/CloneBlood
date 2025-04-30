@@ -128,7 +128,7 @@ public class HumanStats : MonoBehaviour
         if (currentBlood <= 0) return;
 
         // 衝突したオブジェクトのタグに基づきダメージを計算
-        int damage = GetDamageFromTag(tag, "Human");
+        int damage = GameReferences.Instance.GetDamageFromTag(tag, "Human");
 
         if(damage <= 0) return; // ダメージが0なら何もしない
 
@@ -183,30 +183,6 @@ public class HumanStats : MonoBehaviour
             Destroy(gameObject);  // ここで即削除
             return; // これ以上なにもしない（パーティクル処理とかスキップ）
         }
-    }
-
-    // 【追加】タグからダメージを取得する関数
-    private int GetDamageFromTag(string tag, string targetType)
-    {
-        // タグがnull、または"@"から始まってないなら無視
-        if (string.IsNullOrEmpty(tag) || tag[0] != '@') return 0;
-
-        // "@"を除いた部分を分解
-        string[] parts = tag.Substring(1).Split('_');
-        if (parts.Length == 2)
-        {
-            string tagType = parts[0];
-            int dmg;
-            if (int.TryParse(parts[1], out dmg))
-            {
-                // 自分に向けた攻撃か判定（Allはすべてに当たる）
-                if (tagType == "All" || tagType == targetType)
-                {
-                    return dmg;
-                }
-            }
-        }
-        return 0; // 条件を満たさなければダメージ0
     }
 
 }

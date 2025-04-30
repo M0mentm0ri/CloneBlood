@@ -5,26 +5,31 @@ using Unity.Cinemachine;
 
 public class CloneSpawner : MonoBehaviour
 {
-    public GameObject clonePrefab; //クローンのプレハブ
-    public GameObject currentClone; //現在操作するクローン
-    public HumanStats currentHumanStats; // HumanStatsクラスの参照
+    public GameObject clonePrefab;
+    public GameObject currentClone;
+    public HumanStats currentHumanStats;
 
     [Header("UI")]
-    public TMP_Text lifespanText; // 寿命を表示するTMP（設定しておく）
-    public TMP_Text lifeText; // 寿命を表示するTMP（設定しておく）
-    public Transform bloodGaugeObject; // 血液ゲージ
+    public TMP_Text lifespanText;
+    public TMP_Text lifeText;
+    public TMP_Text HealthText;
+    public Transform bloodGaugeObject;
 
     [Header("ゲージ設定")]
-    public float fullGaugeY = 1.0f;   // 体力100%時のローカルY
-    public float emptyGaugeY = 0.0f;  // 体力0%時のローカルY
+    public float fullGaugeY = 1.0f;
+    public float emptyGaugeY = 0.0f;
 
-    public CinemachineCamera cinemachineCamera; // カメラ
-    public Camera maincamera; //メインカメラの参照
-    public Transform spawnPoint; //クローンを生成する位置
+    public CinemachineCamera cinemachineCamera;
+    public Camera maincamera;
+    public Transform spawnPoint;
+
+    [Header("耐久値")]
+    public int maxHealth = 100; // 最大耐久
+    public int currentHealth = 100; // 現在の耐久
 
     void Start()
     {
-        // 初期クローンを生成
+        currentHealth = maxHealth;
         SpawnClone();
     }
 
@@ -40,37 +45,31 @@ public class CloneSpawner : MonoBehaviour
     {
         if (currentHumanStats != null)
         {
-            currentHumanStats.IsInitiative = false; // 操作するクローンに設定
+            currentHumanStats.IsInitiative = false;
         }
 
-        // クローンを生成
         currentClone = Instantiate(clonePrefab, spawnPoint.position, spawnPoint.rotation);
         currentHumanStats = currentClone.GetComponent<HumanStats>();
 
-        // Cloneが持つmouthObjectをカメラに追従させる
         if (cinemachineCamera != null && currentHumanStats != null && currentHumanStats.weaponPickup.mouthObject != null)
         {
             cinemachineCamera.Follow = currentHumanStats.weaponPickup.mouthObject;
             cinemachineCamera.LookAt = currentHumanStats.weaponPickup.mouthObject;
         }
 
-        currentHumanStats.cloneSpawner = this; // CloneSpawnerの参照を設定
+        currentHumanStats.cloneSpawner = this;
         currentHumanStats.cam = maincamera;
-        currentHumanStats.IsInitiative = true; // 操作するクローンに設定
+        currentHumanStats.IsInitiative = true;
     }
 
     public void RespawnClone()
     {
-        // クローンが死んだら1秒後に再生成
         StartCoroutine(RespawnCoroutine());
     }
 
     private IEnumerator RespawnCoroutine()
     {
-        // 1秒待機
         yield return new WaitForSeconds(1f);
-
-        // 新しいクローンを生成
         SpawnClone();
     }
 
@@ -81,7 +80,6 @@ public class CloneSpawner : MonoBehaviour
             float remaining = Mathf.Max(0, currentHumanStats.lifespan - currentHumanStats.age);
             lifespanText.text = $"{remaining:F0}";
 
-            // 色変更処理
             Color baseColor = Color.white;
             float halfLife = currentHumanStats.lifespan / 2f;
             float alpha = 0.1f;
@@ -100,7 +98,6 @@ public class CloneSpawner : MonoBehaviour
             lifeText.color = baseColor;
         }
 
-        // 血液ゲージ
         if (bloodGaugeObject != null)
         {
             float bloodPercent = Mathf.Clamp01(currentHumanStats.currentBlood / currentHumanStats.maxBlood);
@@ -109,5 +106,49 @@ public class CloneSpawner : MonoBehaviour
             localPos.y = y;
             bloodGaugeObject.localPosition = localPos;
         }
+
+        if (HealthText != null)
+        {
+            float percentage = ((float)currentHealth / (float)maxHealth) * 100f;
+            HealthText.text = $"{Mathf.RoundToInt(percentage)}%";
+        }
+
+
+    }
+
+    // ✅ OnTriggerEnterによるダメージ処理
+    private void OnTriggerEnter(Collider other)
+    {
+        ApplyDamageFromCollider(other.tag);
+    }
+
+    // ✅ パーティクル衝突によるダメージ処理
+    private void OnParticleCollision(GameObject other)
+    {
+        ApplyDamageFromCollider(other.tag);
+    }
+
+    // 共通ダメージ処理
+    private void ApplyDamageFromCollider(string otherTag)
+    {
+        int damage = GameReferences.Instance.GetDamageFromTag(otherTag, "Human");
+        if (damage > 0)
+        {
+            currentHealth -= damage;
+            Debug.Log($"CloneSpawnerが{damage}のダメージを受けた！ 残りHP: {currentHealth}");
+
+            if (currentHealth <= 0)
+            {
+                GameOver();
+            }
+        }
+    }
+
+    // ✅ ゲーム終了処理（仮）
+    private void GameOver()
+    {
+        Debug.Log("ゲームオーバー！");
+        // TODO: 実際のゲーム終了演出などを追加（UI遷移、シーン遷移など）
+        Time.timeScale = 0f;
     }
 }

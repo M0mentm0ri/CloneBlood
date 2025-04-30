@@ -26,4 +26,25 @@ public class GameReferences : MonoBehaviour
         // シーンまたぎたいならこいつも付ける
         // DontDestroyOnLoad(gameObject);
     }
+
+    // ダメージ計算
+    public int GetDamageFromTag(string tag, string targetType)
+    {
+        if (string.IsNullOrEmpty(tag) || tag[0] != '@') return 0;
+
+        string[] parts = tag.Substring(1).Split('_');
+        if (parts.Length == 2)
+        {
+            string tagType = parts[0];
+            int dmg;
+            if (int.TryParse(parts[1], out dmg))
+            {
+                if (tagType == "All" || tagType == targetType)
+                {
+                    return dmg;
+                }
+            }
+        }
+        return 0;
+    }
 }

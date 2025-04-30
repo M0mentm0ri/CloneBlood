@@ -11,6 +11,9 @@ public class EnemyBase : MonoBehaviour
     public float moveSpeed;
     public float baseMoveSpeed = 5f;
 
+    public float detectionRange = 2f;
+    public float sphereRadius = 0.5f;
+
     // === 参照 ===
     public Transform targetPosition;
     public Animator animator;
@@ -21,6 +24,9 @@ public class EnemyBase : MonoBehaviour
     public SpriteRenderer[] spriteRenderers;  // 複数のSpriteRendererを格納
     public Color maxHealthColor = Color.white; // 最大ヘルス時の色
     public Color minHealthColor = Color.red;  // 最低ヘルス時の色
+
+    [Header("攻撃判定用")]
+    public GameObject attackCollider; // 一時的にアクティブにする攻撃用の当たり判定
 
     [Header("参照")]
     private ParticleManager particleManager; // パーティクルマネージャーの参照
@@ -122,6 +128,29 @@ public class EnemyBase : MonoBehaviour
         }
     }
 
+
+    // プレイヤーの検出処理（X軸方向にSphereCast）
+    protected bool DetectTarget()
+    {
+        Vector3 origin = flontposition.position;
+        Vector3 baseDirection = transform.right;
+        Vector3 direction = (baseDirection.x < 0) ? -baseDirection : baseDirection;
+
+        RaycastHit hit;
+
+        // X軸方向に短距離SphereCast
+        if (Physics.SphereCast(origin, sphereRadius, direction, out hit, detectionRange))
+        {
+            // Layer判定（例: "Player" レイヤー）
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+            {
+                return true; // プレイヤー検知
+            }
+        }
+
+        return false; // 検知なし
+    }
+
     // 攻撃処理
     protected virtual void Attack()
     {
@@ -129,19 +158,12 @@ public class EnemyBase : MonoBehaviour
         // 攻撃ロジックを書く（例：ダメージ判定）
     }
 
-    // ターゲット検知
-    protected virtual bool DetectTarget()
-    {
-        // ここにRaycastやSphereCastなどを書く予定
-        return false;
-    }
-
     private void OnParticleCollision(GameObject other)
     {
         if (isDead) return;
 
         // ダメージ処理
-        int damage = GetDamageFromTag(other.tag, "Enemy");
+        int damage = GameReferences.Instance.GetDamageFromTag(other.tag, "Enemy");
 
         if (damage > 0)
         {
@@ -152,27 +174,6 @@ public class EnemyBase : MonoBehaviour
         {
             Die();
         }
-    }
-
-    // ダメージ計算
-    private int GetDamageFromTag(string tag, string targetType)
-    {
-        if (string.IsNullOrEmpty(tag) || tag[0] != '@') return 0;
-
-        string[] parts = tag.Substring(1).Split('_');
-        if (parts.Length == 2)
-        {
-            string tagType = parts[0];
-            int dmg;
-            if (int.TryParse(parts[1], out dmg))
-            {
-                if (tagType == "All" || tagType == targetType)
-                {
-                    return dmg;
-                }
-            }
-        }
-        return 0;
     }
 
     // 死亡処理
@@ -214,5 +215,41 @@ public class EnemyBase : MonoBehaviour
 
         // オブジェクトを非アクティブ化して完全に消す
         gameObject.SetActive(false);
+    }
+
+    // アニメーションイベントで呼び出される攻撃実行処理
+    public void PerformAttack()
+    {
+        StartCoroutine(ActivateAttackCollider());
+    }
+
+    private IEnumerator ActivateAttackCollider()
+    {
+        attackCollider.SetActive(true);
+        yield return new WaitForSeconds(0.1f); // 一瞬だけ有効（ヒット検出用）
+        attackCollider.SetActive(false);
+    }
+
+
+    private void OnDrawGizmos()
+    {
+        if (flontposition == null) return;
+
+        Vector3 origin = flontposition.position;
+
+        // 向きは localScale.x で見た目に合わせて調整
+        Vector3 direction = (transform.localScale.x < 0f) ? -transform.right : transform.right;
+
+        // Ray（検出線）の可視化
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(origin, origin + direction * detectionRange);
+
+        // 終点にSphere（検出範囲の目安）を描画
+        Gizmos.color = new Color(0, 0, 1, 0.3f);
+        Gizmos.DrawWireSphere(origin + direction * detectionRange, sphereRadius);
+
+        // 起点にもSphere（開始点の範囲）を描画
+        Gizmos.color = new Color(0, 0.5f, 1f, 0.2f);
+        Gizmos.DrawWireSphere(origin, sphereRadius);
     }
 }
