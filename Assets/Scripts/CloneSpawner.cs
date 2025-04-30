@@ -149,6 +149,6 @@ public class CloneSpawner : MonoBehaviour
     {
         Debug.Log("ゲームオーバー！");
         // TODO: 実際のゲーム終了演出などを追加（UI遷移、シーン遷移など）
-        Time.timeScale = 0f;
+        Time.timeScale = 1f;
     }
 }

@@ -13,6 +13,7 @@ public class EnemyBase : MonoBehaviour
 
     public float detectionRange = 2f;
     public float sphereRadius = 0.5f;
+    public float stoppingDistance = 3f; // この距離内に入ったら移動を停止
 
     // === 参照 ===
     public Transform targetPosition;
@@ -93,6 +94,8 @@ public class EnemyBase : MonoBehaviour
         // アニメSpeed調整
         UpdateAnimationSpeed();
 
+        if(targetPosition == null) return;
+
         // 方向
         Vector3 flatCurrent = new Vector3(transform.position.x, 0, transform.position.z); // Y軸を無視して2D移動
         Vector3 flatTarget = new Vector3(targetPosition.position.x, 0, targetPosition.position.z); // Y軸を無視
@@ -100,7 +103,6 @@ public class EnemyBase : MonoBehaviour
 
         // 目標地点に近づいたか判定するための距離
         float distanceToTarget = Vector3.Distance(flatCurrent, flatTarget);
-        float stoppingDistance = 5f; // この距離内に入ったら移動を停止
 
         // 実際に移動
         if (distanceToTarget > stoppingDistance)

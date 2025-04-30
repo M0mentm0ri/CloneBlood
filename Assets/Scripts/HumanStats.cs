@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
-using TMPro; // TextMeshProを使う場合に必要
+using TMPro;
+using System.Collections; // TextMeshProを使う場合に必要
 
 public class HumanStats : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class HumanStats : MonoBehaviour
     [Header("あたり判定")]
     public Collider hitbox;
 
+    [Header("無敵設定")]
+    public float invincibleDuration = 3f; // 無敵時間（秒）
+    private bool isInvincible = false;    // 無敵状態フラグ
+
     [Header("参照")]
     public Human human; // Humanクラスの参照
     public WeaponPickup weaponPickup; // 武器を持つスクリプト
@@ -20,8 +25,7 @@ public class HumanStats : MonoBehaviour
 
     [Header("色変化設定")]
     public SpriteRenderer[] spriteRenderers; // 色を変えたいスプライトたち
-    public Color maxHealthColor = Color.white; // 血液MAX時の色
-    public Color minHealthColor = Color.red;   // 血液がゼロに近い時の色
+    public Color blinkColor; // 点滅時の色
 
     public Camera cam;
     public bool IsInitiative = false;
@@ -30,6 +34,7 @@ public class HumanStats : MonoBehaviour
     private void Start()
     {
         currentBlood = maxBlood;
+        StartCoroutine(InvincibilityRoutine());
     }
 
     private void Update()
@@ -43,8 +48,6 @@ public class HumanStats : MonoBehaviour
                 Dead();
             }
         }
-
-        UpdateSpriteColor();
     }
 
     private void HandleLifespan()
@@ -87,27 +90,6 @@ public class HumanStats : MonoBehaviour
 
     }
 
-    // ここが色を変える処理
-    private void UpdateSpriteColor()
-    {
-        // 血液量の割合を計算する
-        float bloodRatio = currentBlood / maxBlood;
-
-        // 0〜1の間に制限（万が一0未満や1超えを防ぐ）
-        bloodRatio = Mathf.Clamp01(bloodRatio);
-
-        // 血液が多いと白に近く、減ると赤に近づく
-        Color currentColor = Color.Lerp(minHealthColor, maxHealthColor, Mathf.Pow(bloodRatio, 0.5f));
-
-        // 複数のスプライトがあれば全て色を変える
-        foreach (SpriteRenderer renderer in spriteRenderers)
-        {
-            if (renderer != null)
-            {
-                renderer.color = currentColor;
-            }
-        }
-    }
 
     // トリガー衝突時に呼ばれる
     private void OnTriggerEnter(Collider other)
@@ -121,67 +103,112 @@ public class HumanStats : MonoBehaviour
         HandleDamage(other.tag); // 衝突したオブジェクトのタグでダメージ処理
     }
 
+    // 無敵時間＋点滅風カラー変化処理
+    private IEnumerator InvincibilityRoutine()
+    {
+        isInvincible = true;
+
+        float elapsed = 0f;
+        float blinkCycle = 1f; // 点滅サイクル（1秒で往復）
+        Color originalColor = spriteRenderers[0].color;
+
+        while (elapsed < invincibleDuration)
+        {
+            elapsed += Time.deltaTime;
+
+            float t = Mathf.PingPong(Time.time * (1f / blinkCycle), 1f);
+            Color lerpedColor = Color.Lerp(originalColor, blinkColor, t);
+
+            foreach (var renderer in spriteRenderers)
+            {
+                if (renderer != null)
+                    renderer.color = lerpedColor;
+            }
+
+            yield return null;
+        }
+
+        // ✨ 無敵終了後、なめらかに元の色に戻す
+        float restoreDuration = 0.5f; // 徐々に戻す時間（0.5秒など）
+        float restoreElapsed = 0f;
+        Color currentColor = spriteRenderers[0].color;
+
+        while (restoreElapsed < restoreDuration)
+        {
+            restoreElapsed += Time.deltaTime;
+            float t = restoreElapsed / restoreDuration;
+            Color backToOriginal = Color.Lerp(currentColor, originalColor, t);
+
+            foreach (var renderer in spriteRenderers)
+            {
+                if (renderer != null)
+                    renderer.color = backToOriginal;
+            }
+
+            yield return null;
+        }
+
+        // 念のため完全に戻す
+        foreach (var renderer in spriteRenderers)
+        {
+            if (renderer != null)
+                renderer.color = originalColor;
+        }
+
+        isInvincible = false;
+    }
+
+
     // 共通のダメージ処理
     private void HandleDamage(string tag)
     {
-        // すでに死亡していたら何もしない
+        // 🔒 無敵中は処理しない
+        if (isInvincible) return;
+
         if (currentBlood <= 0) return;
 
-        // 衝突したオブジェクトのタグに基づきダメージを計算
+        // ダメージ処理以下は既存コードと同じ
         int damage = GameReferences.Instance.GetDamageFromTag(tag, "Human");
 
-        if(damage <= 0) return; // ダメージが0なら何もしない
+        if (damage <= 0) return;
 
-        // ダメージがあれば血液量を減らす
-        if (damage > 0)
-        {
-            currentBlood -= damage;
-            Debug.Log($"{gameObject.name} が {damage} ダメージを受けた！（残り血液量: {currentBlood}）");
-        }
+        currentBlood -= damage;
+        Debug.Log($"{gameObject.name} が {damage} ダメージを受けた！（残り血液量: {currentBlood}）");
 
-        // 血液量が0以下になったら死亡
         if (currentBlood <= 0)
         {
             Dead();
         }
 
-        // 血液パーティクルを再生
-        Vector3 hitPos = human.centerPoint.position; // 衝突位置（例として現在位置を使用）
-        Quaternion finalRot = Quaternion.identity; // 衝突面の回転（必要に応じて計算する）
+        Vector3 hitPos = human.centerPoint.position;
+        Quaternion finalRot = Quaternion.identity;
 
-        // ダメージ量に応じて血液パーティクルを変更
         if (damage < 10)
         {
-            // Lowダメージ時
             GameReferences.Instance.particleManager.PlayParticle(
-                ParticleManager.ParticleType.Blood_Low,  // 血のパーティクル（Low）
-                hitPos,                                   // 衝突位置
-                finalRot                                  // 衝突面に基づく回転
+                ParticleManager.ParticleType.Blood_Low,
+                hitPos,
+                finalRot
             );
         }
         else if (damage < 50)
         {
-            // Midダメージ時
             GameReferences.Instance.particleManager.PlayParticle(
-                ParticleManager.ParticleType.Blood_Mid,  // 血のパーティクル（Mid）
-                hitPos,                                   // 衝突位置
-                finalRot                                  // 衝突面に基づく回転
+                ParticleManager.ParticleType.Blood_Mid,
+                hitPos,
+                finalRot
             );
         }
 
-
-        // 血液量が0以下になったらオブジェクトを破壊する
         if (currentBlood <= 0)
         {
-            // Highダメージ時
             GameReferences.Instance.particleManager.PlayParticle(
-                ParticleManager.ParticleType.Blood_High,  // 血のパーティクル（High）
-                hitPos,                                   // 衝突位置
-                finalRot                                  // 衝突面に基づく回転
+                ParticleManager.ParticleType.Blood_High,
+                hitPos,
+                finalRot
             );
 
-            Destroy(gameObject);  // ここで即削除
-            return; // これ以上なにもしない（パーティクル処理とかスキップ）
+            Destroy(gameObject);
         }
     }
 
