@@ -9,11 +9,19 @@ using TMPro;
 [System.Serializable]
 public class SpawnInstruction
 {
-    public GameObject enemyPrefab; // 出す敵の種類（Prefab）
-    public int spawnCount;         // 何体出すか
-    public Transform spawnPoint;   // どの地点から出すか
-    public Target target;        // どのターゲットを狙うか
-    public float waitAfterSpawn;   // この指示後、何秒待機するか
+    public GameObject enemyPrefab;
+    public int spawnCount;
+    public SpawnPointType spawnPointType; // 追加：どの方向から出すか
+    public Target target;
+    public float waitAfterSpawn;
+}
+
+public enum SpawnPointType
+{
+    RightGround,
+    LeftGround,
+    RightAir,
+    LeftAir,
 }
 
 public enum Target
@@ -35,10 +43,18 @@ public class WaveData
 /// <summary>
 /// Wave全体を管理し、順に敵を出すクラス
 /// </summary>
+[System.Serializable]
+public class SpawnPointEntry
+{
+    public SpawnPointType type;
+    public Transform transform;
+}
+
 
 public class WaveSystem : MonoBehaviour
 {
     public List<WaveData> waves = new List<WaveData>();
+    public List<SpawnPointEntry> spawnPoints = new List<SpawnPointEntry>();
     public float startDelay = 2f;
     private int currentWaveIndex = 0;
 
@@ -47,6 +63,13 @@ public class WaveSystem : MonoBehaviour
     public TMP_Text waveCompleteText; // Wave完了テキスト用（UnityのUI Text）
 
     private int aliveEnemyCount = 0; // 生きている敵の数
+
+    [Header("方向別の矢印表示UI")]
+    public TMP_Text rightGroundArrow;
+    public TMP_Text leftGroundArrow;
+    public TMP_Text rightAirArrow;
+    public TMP_Text leftAirArrow;
+
 
     private void Start()
     {
@@ -87,6 +110,7 @@ public class WaveSystem : MonoBehaviour
 
         while (currentWaveIndex < waves.Count)
         {
+
             // ▼ WAVE開始テキスト表示（通常 or 最終）
             if (currentWaveIndex == waves.Count - 1)
             {
@@ -101,13 +125,19 @@ public class WaveSystem : MonoBehaviour
             waveCompleteText.text = "";
 
             WaveData wave = waves[currentWaveIndex];
+
+            yield return StartCoroutine(ShowDirectionIndicators(wave.instructions));
+
             aliveEnemyCount = 0;
 
             foreach (var instruction in wave.instructions)
             {
                 for (int i = 0; i < instruction.spawnCount; i++)
                 {
-                    GameObject enemy = Instantiate(instruction.enemyPrefab, instruction.spawnPoint.position, Quaternion.identity);
+                    Transform spawnTransform = GetSpawnTransform(instruction.spawnPointType);
+                    GameObject enemy = Instantiate(instruction.enemyPrefab, spawnTransform.position, Quaternion.identity);
+
+
 
                     EnemyBase enemyBase = enemy.GetComponent<EnemyBase>();
                     if (enemyBase == null)
@@ -143,5 +173,63 @@ public class WaveSystem : MonoBehaviour
         }
 
         Debug.Log("全ウェーブ完了！");
+    }
+
+    private IEnumerator ShowDirectionIndicators(List<SpawnInstruction> instructions)
+    {
+        // カウント初期化
+        Dictionary<SpawnPointType, int> spawnCounts = new();
+        foreach (SpawnPointType type in System.Enum.GetValues(typeof(SpawnPointType)))
+        {
+            spawnCounts[type] = 0;
+        }
+
+        // 指示ごとに数を集計
+        foreach (var instr in instructions)
+        {
+            spawnCounts[instr.spawnPointType] += instr.spawnCount;
+        }
+
+        // 表示をセット（1体なら＜、2体以上なら＜＜）
+        rightGroundArrow.text = spawnCounts[SpawnPointType.RightGround] >= 2 ? "<<" : spawnCounts[SpawnPointType.RightGround] == 1 ? "<" : "";
+        leftGroundArrow.text = spawnCounts[SpawnPointType.LeftGround] >= 2 ? "<<" : spawnCounts[SpawnPointType.LeftGround] == 1 ? "<" : "";
+        rightAirArrow.text = spawnCounts[SpawnPointType.RightAir] >= 2 ? "<<" : spawnCounts[SpawnPointType.RightAir] == 1 ? "<" : "";
+        leftAirArrow.text = spawnCounts[SpawnPointType.LeftAir] >= 2 ? "<<" : spawnCounts[SpawnPointType.LeftAir] == 1 ? "<" : "";
+
+        // 点滅処理
+        float blinkTime = 2f;
+        float elapsed = 0f;
+        bool visible = true;
+
+        while (elapsed < blinkTime)
+        {
+            visible = !visible;
+
+            rightGroundArrow.enabled = visible;
+            leftGroundArrow.enabled = visible;
+            rightAirArrow.enabled = visible;
+            leftAirArrow.enabled = visible;
+
+            yield return new WaitForSeconds(0.3f);
+            elapsed += 0.3f;
+        }
+
+        // 全部非表示
+        rightGroundArrow.text = "";
+        leftGroundArrow.text = "";
+        rightAirArrow.text = "";
+        leftAirArrow.text = "";
+    }
+
+    private Transform GetSpawnTransform(SpawnPointType type)
+    {
+        foreach (var entry in spawnPoints)
+        {
+            if (entry.type == type)
+                return entry.transform;
+        }
+
+        Debug.LogError($"SpawnPointType {type} に対応するTransformがありません");
+        return null;
     }
 }

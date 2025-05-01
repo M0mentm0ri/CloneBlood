@@ -113,6 +113,10 @@ PrefabInstance:
       value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8346890199288689398, guid: abb5e03db90692241be5362dd7820df4, type: 3}
+      propertyPath: moveSpeed
+      value: 1.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8346890199288689398, guid: abb5e03db90692241be5362dd7820df4, type: 3}
       propertyPath: sphereRadius
       value: 2.32
       objectReference: {fileID: 0}

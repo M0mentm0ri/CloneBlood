@@ -11,8 +11,8 @@ public class EnemyBase : MonoBehaviour
     public float moveSpeed;
     public float baseMoveSpeed = 5f;
 
-    public float detectionRange = 2f;
-    public float sphereRadius = 0.5f;
+    public float detectionRange = 2f; // プレイヤーを検出する距離
+    public float sphereRadius = 0.5f; // SphereCastの半径
     public float stoppingDistance = 3f; // この距離内に入ったら移動を停止
 
     // === 参照 ===
@@ -133,7 +133,7 @@ public class EnemyBase : MonoBehaviour
 
 
     // プレイヤーの検出処理（X軸方向にSphereCast）
-    protected bool DetectTarget()
+    protected virtual bool DetectTarget()
     {
         Vector3 origin = flontposition.position;
         Vector3 baseDirection = transform.right;
