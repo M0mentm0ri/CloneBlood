@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      hummer_0: 5816024215916100673
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
